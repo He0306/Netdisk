@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hc.mapper.FileInfoMapper">
+
+    <update id="updateFileStatusWithholdStatus">
+        update tb_file_info
+        <set>
+            <if test="fileInfo.fileMd5 != null">
+                file_md5 = #{fileInfo.fileMd5},
+            </if>
+            <if test="fileInfo.filePid != null">
+                file_pid = #{fileInfo.filePid},
+            </if>
+            <if test="fileInfo.fileSize != null">
+                file_size = #{fileInfo.fileSize},
+            </if>
+            <if test="fileInfo.fileName != null">
+                file_name = #{fileInfo.fileName},
+            </if>
+            <if test="fileInfo.fileCover != null">
+                file_cover = #{fileInfo.fileCover},
+            </if>
+            <if test="fileInfo.filePath != null">
+                file_path = #{fileInfo.filePath},
+            </if>
+            <if test="fileInfo.createTime != null">
+                create_time = #{fileInfo.createTime},
+            </if>
+            <if test="fileInfo.lastUpdateTime != null">
+                last_update_time = #{fileInfo.lastUpdateTime},
+            </if>
+            <if test="fileInfo.folderType != null">
+                folder_type = #{fileInfo.folderType},
+            </if>
+            <if test="fileInfo.fileCategory != null">
+                file_category = #{fileInfo.fileCategory},
+            </if>
+            <if test="fileInfo.fileType != null">
+                file_type = #{fileInfo.fileType},
+            </if>
+            <if test="fileInfo.status != null">
+                status = #{fileInfo.status},
+            </if>
+            <if test="fileInfo.recoveryTime != null">
+                recovery_time = #{fileInfo.recoveryTime},
+            </if>
+            <if test="fileInfo.delFlag != null">
+                del_flag = #{fileInfo.delFlag}
+            </if>
+        </set>
+        where file_id = #{fileId} and user_id = #{userId} and status = #{oldStatus}
+    </update>
+
+    <update id="updateByFileIdAndUserId">
+        update tb_file_info
+        set
+        <if test="fileName != null and fileName != ''">
+            file_name = #{fileName}
+        </if>
+        <if test="lastUpdateTime != null">
+            ,last_update_time = #{lastUpdateTime}
+        </if>
+        <if test="filePid != null and filePid != ''">
+            ,file_pid = #{filePid}
+        </if>
+        where
+        <if test="userId != null and userId != ''">
+            user_id = #{userId}
+        </if>
+        <if test="fileId != null and fileId != ''">
+            and file_id = #{fileId}
+        </if>
+    </update>
+
+    <update id="updateFileDelFlagBatch">
+        update tb_file_info
+        set del_flag = #{fileInfo.delFlag}
+        <if test="fileInfo.recoveryTime != null">
+            ,recovery_time = #{fileInfo.recoveryTime}
+        </if>
+        <if test="fileInfo.lastUpdateTime != null">
+            ,last_update_time = #{lastUpdateTime}
+        </if>
+        where user_id = #{fileInfo.userId}
+        <if test="fileIds != null">
+            and file_id in (<foreach collection="fileIds" separator="," item="item">#{item}</foreach>)
+        </if>
+        <if test="filePids != null">
+            and file_pid in (<foreach collection="filePids" separator="," item="item">#{item}</foreach>)
+        </if>
+    </update>
+
+    <update id="updateByUserAndFileId">
+        update tb_file_info
+        set file_name = #{fileName}
+        where user_id = #{userId}
+        and file_id = #{fileId}
+    </update>
+
+    <select id="selectUserSpace" resultType="java.lang.Long">
+        select ifnull(sum(file_size), 0)
+        from tb_file_info
+        where user_id = #{userId}
+    </select>
+
+</mapper>

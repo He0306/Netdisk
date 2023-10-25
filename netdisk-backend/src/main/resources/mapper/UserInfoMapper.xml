@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hc.mapper.UserInfoMapper">
+
+    <update id="updateUserSpaceInteger">
+        update tb_user_info
+        <set>
+            <if test="userSpace !=null">
+                user_space = user_space + #{userSpace}
+            </if>
+            <if test="totalSpace !=null">
+                total_space = total_space + #{totalSpace}
+            </if>
+        </set>
+        where user_id = #{userId}
+        <if test="userSpace !=null">
+            and <![CDATA[(user_space + #{userSpace}) <= total_space]]>
+        </if>
+        <if test="totalSpace !=null">
+            and <![CDATA[(total_space + #{totalSpace}) >= user_space]]>
+        </if>
+    </update>
+
+    <select id="selectByEmail" resultType="com.hc.entity.UserInfo">
+        select * from tb_user_info where email = #{email}
+    </select>
+</mapper>
