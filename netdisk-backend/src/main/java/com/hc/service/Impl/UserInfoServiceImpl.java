@@ -1,6 +1,8 @@
 package com.hc.service.Impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hc.common.enums.HttpCodeEnum;
 import com.hc.common.enums.UserStatusEnum;
@@ -12,6 +14,7 @@ import com.hc.entity.dto.QQInfoDto;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.dto.SysSettingsDto;
 import com.hc.entity.dto.UserSpaceDto;
+import com.hc.entity.query.UserInfoQuery;
 import com.hc.mapper.FileInfoMapper;
 import com.hc.mapper.UserInfoMapper;
 import com.hc.service.EmailCodeService;
@@ -160,6 +163,57 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         emailCodeService.checkCode(email, emailCode);
         userInfo.setPassword(MD5Util.encodeByMd5(password));
         userInfoMapper.updateById(userInfo);
+    }
+
+    /**
+     * 更新用户空间
+     *
+     * @param userId
+     * @param changeSpace
+     */
+    @Override
+    public void updateUserSpace(String userId, Integer changeSpace) {
+        Long space = changeSpace * Constants.MB;
+        userInfoMapper.updateUserSpaceInteger(userId, null, space);
+        redisComponent.restUserSpaceUse(userId);
+    }
+
+    /**
+     * 根据用户ID更新用户状态
+     *
+     * @param userId
+     * @param status
+     */
+    @Override
+    public void updateUserInfoStatus(String userId, Integer status) {
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(userId);
+        userInfo.setStatus(status);
+        if (UserStatusEnum.DISABLE.getStatus().equals(status)) {
+            userInfo.setUserSpace(0L);
+            fileInfoMapper.deleteByUserId(userId);
+        }
+        userInfoMapper.updateById(userInfo);
+    }
+
+    /**
+     * 分页查询所以用户
+     *
+     * @param userInfoQuery
+     * @return
+     */
+    @Override
+    public IPage<UserInfo> findUserInfoListByPage(UserInfoQuery userInfoQuery) {
+        Page<UserInfo> page = new Page<>(userInfoQuery.getPageNo(), userInfoQuery.getPageSize());
+        LambdaQueryWrapper<UserInfo> wrapper = new LambdaQueryWrapper<>();
+        if (!StringUtils.isEmpty(userInfoQuery.getNickName())) {
+            wrapper.like(UserInfo::getNickName, userInfoQuery.getNickName());
+        }
+        if (userInfoQuery.getStatus() != null) {
+            wrapper.eq(UserInfo::getStatus, userInfoQuery.getStatus());
+        }
+        wrapper.orderByDesc(UserInfo::getJoinTime);
+        return userInfoMapper.selectPage(page, wrapper);
     }
 
     /**

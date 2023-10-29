@@ -1,10 +1,12 @@
 package com.hc.component;
 
 import com.hc.common.lang.Constants;
+import com.hc.entity.UserInfo;
 import com.hc.entity.dto.DownLoadFileDto;
 import com.hc.entity.dto.SysSettingsDto;
 import com.hc.entity.dto.UserSpaceDto;
 import com.hc.mapper.FileInfoMapper;
+import com.hc.mapper.UserInfoMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -22,8 +24,11 @@ public class RedisComponent {
     @Autowired
     FileInfoMapper fileInfoMapper;
 
+    @Autowired
+    UserInfoMapper userInfoMapper;
+
     /**
-     * 初始化用户空间
+     * 获取用户设置信息
      *
      * @return
      */
@@ -37,6 +42,15 @@ public class RedisComponent {
     }
 
     /**
+     * 保存系统设置信息
+     *
+     * @param sysSettingsDto
+     */
+    public void saveSysSettingsDto(SysSettingsDto sysSettingsDto) {
+        redisUtil.set(Constants.REDIS_KEY_SYS_SETTING, sysSettingsDto);
+    }
+
+    /**
      * 保存用户空间
      *
      * @param userId
@@ -44,6 +58,22 @@ public class RedisComponent {
      */
     public void saveUserSpaceUse(String userId, UserSpaceDto userSpaceDto) {
         redisUtil.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, userSpaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
+    }
+
+    /**
+     * 根据用户ID重置用户已使用的空间
+     *
+     * @param userId
+     * @return
+     */
+    public UserSpaceDto restUserSpaceUse(String userId) {
+        UserSpaceDto userSpaceDto = new UserSpaceDto();
+        Long useSpace = fileInfoMapper.selectUserSpace(userId);
+        userSpaceDto.setUseSpace(useSpace);
+        UserInfo userInfo = userInfoMapper.selectById(userId);
+        userSpaceDto.setTotalSpace(userInfo.getTotalSpace());
+        redisUtil.setex(Constants.REDIS_KEY_USER_SPACE_USE + userId, userSpaceDto, Constants.REDIS_KEY_EXPIRES_DAY);
+        return userSpaceDto;
     }
 
     /**

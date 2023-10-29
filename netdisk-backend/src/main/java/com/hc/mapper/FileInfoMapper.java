@@ -54,4 +54,10 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
      * @param fileInfo
      */
     void updateByUserAndFileId(FileInfo fileInfo);
+
+    /**
+     * 根据用户ID删除
+     * @param userId
+     */
+    void deleteByUserId(@Param("userId") String userId);
 }

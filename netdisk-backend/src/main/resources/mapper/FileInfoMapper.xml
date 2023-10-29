@@ -97,6 +97,10 @@
         and file_id = #{fileId}
     </update>
 
+    <delete id="deleteByUserId">
+        delete from tb_file_info where user_id = #{userId}
+    </delete>
+
     <select id="selectUserSpace" resultType="java.lang.Long">
         select ifnull(sum(file_size), 0)
         from tb_file_info

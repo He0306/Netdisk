@@ -1,8 +1,10 @@
 package com.hc.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hc.entity.UserInfo;
 import com.hc.entity.dto.SessionWebUserDto;
+import com.hc.entity.query.UserInfoQuery;
 
 /**
  * @author: 何超
@@ -41,4 +43,25 @@ public interface UserInfoService extends IService<UserInfo> {
      * @param code
      */
     SessionWebUserDto qqLogin(String code);
+
+    /**
+     * 分页查询所以用户
+     * @param userInfoQuery
+     * @return
+     */
+    IPage<UserInfo> findUserInfoListByPage(UserInfoQuery userInfoQuery);
+
+    /**
+     * 根据用户ID更新用户状态
+     * @param userId
+     * @param status
+     */
+    void updateUserInfoStatus(String userId,Integer status);
+
+    /**
+     * 更新用户空间
+     * @param userId
+     * @param changeSpace
+     */
+    void updateUserSpace(String userId,Integer changeSpace);
 }
