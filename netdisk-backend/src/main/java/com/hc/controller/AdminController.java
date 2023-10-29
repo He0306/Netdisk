@@ -56,9 +56,9 @@ public class AdminController {
      */
     @PostMapping("/saveSysSettings")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
-    public Result saveSysSettings(@VerifyParam(required = true) String registerEMailTitle, @VerifyParam(required = true) String registerEmailContent, @VerifyParam(required = true) Integer userInitUserSpace) {
+    public Result saveSysSettings(@VerifyParam(required = true) String registerEmailTitle, @VerifyParam(required = true) String registerEmailContent, @VerifyParam(required = true) Integer userInitUserSpace) {
         SysSettingsDto sysSettingsDto = new SysSettingsDto();
-        sysSettingsDto.setRegisterEMailTitle(registerEMailTitle);
+        sysSettingsDto.setRegisterEmailTitle(registerEmailTitle);
         sysSettingsDto.setRegisterEmailContent(registerEmailContent);
         sysSettingsDto.setUserInitUserSpace(userInitUserSpace);
         redisComponent.saveSysSettingsDto(sysSettingsDto);

@@ -14,7 +14,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SysSettingsDto implements Serializable {
 
-    private String registerEMailTitle = "云盘邮箱验证服务";
+    private String registerEmailTitle = "云盘邮箱验证服务";
 
     private String registerEmailContent = "您好，您的邮箱验证码是：%s，5分钟有效";
 

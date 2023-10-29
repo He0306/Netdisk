@@ -63,7 +63,7 @@ public class EmailCodeServiceImpl extends ServiceImpl<EmailCodeMapper, EmailCode
         SysSettingsDto sysSettingsDto = redisComponent.sysSettingsDto();
         mailMessage.setTo(email);
         mailMessage.setFrom(from);
-        mailMessage.setSubject(sysSettingsDto.getRegisterEMailTitle());
+        mailMessage.setSubject(sysSettingsDto.getRegisterEmailTitle());
         mailMessage.setText(String.format(sysSettingsDto.getRegisterEmailContent(), code));
         mailMessage.setSentDate(new Date());
         javaMailSender.send(mailMessage);
