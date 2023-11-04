@@ -16,8 +16,10 @@ import com.hc.entity.dto.SysSettingsDto;
 import com.hc.entity.dto.UserSpaceDto;
 import com.hc.entity.query.UserInfoQuery;
 import com.hc.mapper.FileInfoMapper;
+import com.hc.mapper.ShareMapper;
 import com.hc.mapper.UserInfoMapper;
 import com.hc.service.EmailCodeService;
+import com.hc.service.ShareService;
 import com.hc.service.UserInfoService;
 import com.hc.utils.JsonUtil;
 import com.hc.utils.MD5Util;
@@ -50,6 +52,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Autowired
     EmailCodeService emailCodeService;
+
+    @Autowired
+    ShareMapper shareMapper;
 
     @Autowired
     RedisComponent redisComponent;
@@ -194,6 +199,22 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             fileInfoMapper.deleteByUserId(userId);
         }
         userInfoMapper.updateById(userInfo);
+    }
+
+    /**
+     * 更加用户ID删除
+     *
+     * @param currentUserId
+     * @param userId
+     */
+    @Override
+    public void deleteUser(String currentUserId, String userId) {
+        if (currentUserId.equals(userId)) {
+            throw new ServiceException(HttpCodeEnum.CODE_427);
+        }
+        shareMapper.deleteByUserId(userId);
+        fileInfoMapper.deleteByUserId(userId);
+        userInfoMapper.deleteById(userId);
     }
 
     /**

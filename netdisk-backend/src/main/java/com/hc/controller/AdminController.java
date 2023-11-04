@@ -3,10 +3,13 @@ package com.hc.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.hc.annotation.GlobalInterceptor;
 import com.hc.annotation.VerifyParam;
+import com.hc.common.lang.Constants;
 import com.hc.common.lang.Result;
 import com.hc.component.RedisComponent;
 import com.hc.entity.UserInfo;
+import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.dto.SysSettingsDto;
+import com.hc.entity.query.FileInfoQuery;
 import com.hc.entity.query.UserInfoQuery;
 import com.hc.entity.vo.UserInfoPageVO;
 import com.hc.service.FileInfoService;
@@ -15,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpSession;
 
 /**
  * @author: hec
@@ -49,7 +54,7 @@ public class AdminController {
     /**
      * 保存系统设置信息
      *
-     * @param registerEMailTitle
+     * @param registerEmailTitle
      * @param registerEmailContent
      * @param userInitUserSpace
      * @return
@@ -111,6 +116,26 @@ public class AdminController {
     public Result updateUserSpace(@VerifyParam(required = true) String userId,
                                   @VerifyParam(required = true) Integer changeSpace) {
         userInfoService.updateUserSpace(userId, changeSpace);
+        return Result.success();
+    }
+
+    /**
+     * 根据用户ID删除
+     * @param session
+     * @param userId
+     * @return
+     */
+    @PostMapping("/deleteUser")
+    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    public Result deleteUser(HttpSession session, @VerifyParam(required = true) String userId){
+        SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+        userInfoService.deleteUser(sessionWebUserDto.getUserId(),userId);
+        return Result.success();
+    }
+
+    @PostMapping("/loadFileList")
+    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    public Result loadFileList(FileInfoQuery fileInfoQuery){
         return Result.success();
     }
 }

@@ -22,4 +22,11 @@ public interface ShareMapper extends BaseMapper<Share> {
      * @return
      */
     Integer deleteFileShareBatch(@Param("shareIdArray") String[] shareIdArray, @Param("userId") String userId);
+
+    /**
+     * 更加用户ID删除分享
+     *
+     * @param userId
+     */
+    void deleteByUserId(@Param("userId") String userId);
 }

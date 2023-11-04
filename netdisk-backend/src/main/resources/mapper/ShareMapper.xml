@@ -6,4 +6,8 @@
         where user_id = #{userId}
         and share_id in (<foreach collection="shareIdArray" item="item" separator=",">#{item}</foreach>)
     </delete>
+
+    <delete id="deleteByUserId">
+        delete from tb_share where user_id = #{userId}
+    </delete>
 </mapper>
