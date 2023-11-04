@@ -72,7 +72,7 @@
                             <el-input
                                     clearable
                                     placeholder="请输入空间大小"
-                                    v-model.trim="form.changeSpace">
+                                    v-model.number="form.changeSpace">
                                 <template #suffix>MB</template>
                             </el-input>
                         </el-form-item>

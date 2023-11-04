@@ -20,7 +20,7 @@
               <el-input
                       clearable
                       placeholder="请输入初始化空间大小"
-                      v-model.trim="formData.userInitUserSpace">
+                      v-model.number="formData.userInitUserSpace">
                   <template #suffix>MB</template>
               </el-input>
           </el-form-item>
@@ -44,8 +44,7 @@ const formData = ref({})
 const rules = {
     registerEmailTitle: [{required: true, message: "请输入注册邮箱标题", trigger: 'blur'}],
     registerEmailContent: [{required: true, message: "请输入注册邮箱内容", trigger: 'blur'}],
-    userInitUserSpace: [{required: true, message: "请输入初始化空间大小", trigger: 'blur'},
-        { type: 'number', message: '请输入数字' }]
+    userInitUserSpace: [{required: true, message: "请输入初始化空间大小", trigger: 'blur'}]
 }
 const formDataRef = ref()
 // 加载系统设置信息
