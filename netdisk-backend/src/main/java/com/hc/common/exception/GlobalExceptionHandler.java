@@ -20,9 +20,4 @@ public class GlobalExceptionHandler {
         return Result.failure(serviceException.getStatus(), serviceException.getMessage());
     }
 
-    @ExceptionHandler(Exception.class)
-    @ResponseBody
-    private Result exception(Exception e) {
-        return Result.failure(HttpCodeEnum.CODE_500.getStatus(), e.getMessage());
-    }
 }

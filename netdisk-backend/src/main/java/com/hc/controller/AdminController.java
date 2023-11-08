@@ -6,11 +6,13 @@ import com.hc.annotation.VerifyParam;
 import com.hc.common.lang.Constants;
 import com.hc.common.lang.Result;
 import com.hc.component.RedisComponent;
+import com.hc.entity.FileInfo;
 import com.hc.entity.UserInfo;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.dto.SysSettingsDto;
 import com.hc.entity.query.FileInfoQuery;
 import com.hc.entity.query.UserInfoQuery;
+import com.hc.entity.vo.FileInfoPageVO;
 import com.hc.entity.vo.UserInfoPageVO;
 import com.hc.service.FileInfoService;
 import com.hc.service.UserInfoService;
@@ -135,7 +137,14 @@ public class AdminController {
 
     @PostMapping("/loadFileList")
     @GlobalInterceptor(checkParams = true,checkAdmin = true)
-    public Result loadFileList(FileInfoQuery fileInfoQuery){
-        return Result.success();
+    public Result loadFileList(FileInfoQuery query){
+        IPage<FileInfo> fileInfoIPage = fileInfoService.findAdminFileInfoListByPage(query);
+        FileInfoPageVO fileInfoPageVO = new FileInfoPageVO();
+        fileInfoPageVO.setList(fileInfoIPage.getRecords());
+        fileInfoPageVO.setPageNo(query.getPageNo());
+        fileInfoPageVO.setPageSize(query.getPageSize());
+        fileInfoPageVO.setPageTotal(fileInfoIPage.getCurrent());
+        fileInfoPageVO.setTotalCount(fileInfoIPage.getTotal());
+        return Result.success(fileInfoPageVO);
     }
 }

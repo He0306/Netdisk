@@ -1,6 +1,7 @@
 package com.hc.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -19,6 +20,9 @@ public class FileInfo {
     private String fileId;
 
     private String userId;
+
+    @TableField(exist = false)
+    private String nickName;
 
     private String fileMd5;
 

@@ -9,6 +9,7 @@ import com.hc.common.exception.ServiceException;
 import com.hc.common.lang.Constants;
 import com.hc.component.RedisComponent;
 import com.hc.entity.FileInfo;
+import com.hc.entity.UserInfo;
 import com.hc.entity.dto.DownLoadFileDto;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.dto.UploadResultDto;
@@ -91,6 +92,9 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         if (!StringUtils.isEmpty(query.getFileNameFuzzy())) {
             wrapper.like(FileInfo::getFileName, query.getFileNameFuzzy());
         }
+        if (!StringUtils.isEmpty(query.getUserId())) {
+            wrapper.eq(FileInfo::getUserId, query.getUserId());
+        }
         wrapper.eq(FileInfo::getDelFlag, FileDelFlagEnum.USING.getFlag());
         wrapper.orderByDesc(FileInfo::getLastUpdateTime);
         return fileInfoMapper.selectPage(page, wrapper);
@@ -167,6 +171,26 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
                 fileInfoMapper.updateByUserAndFileId(fileInfo);
             }
         }
+    }
+
+    /**
+     * 管理员查看所以文件
+     *
+     * @param query
+     * @return
+     */
+    @Override
+    public IPage<FileInfo> findAdminFileInfoListByPage(FileInfoQuery query) {
+        Page<FileInfo> page = new Page<>(query.getPageNo(), query.getPageSize());
+        LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.orderByDesc(FileInfo::getLastUpdateTime);
+        Page<FileInfo> infoPage = fileInfoMapper.selectPage(page, wrapper);
+        for (FileInfo record : infoPage.getRecords()) {
+            LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(UserInfo::getUserId, record.getUserId());
+            record.setNickName(userInfoMapper.selectOne(queryWrapper).getNickName());
+        }
+        return infoPage;
     }
 
     /**

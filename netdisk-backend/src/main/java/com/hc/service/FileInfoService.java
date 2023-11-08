@@ -129,5 +129,13 @@ public interface FileInfoService extends IService<FileInfo> {
      * @param userId
      * @param fileIds
      */
-    void delFileBatch(String userId, String fileIds,Boolean adminOp);
+    void delFileBatch(String userId, String fileIds, Boolean adminOp);
+
+    /**
+     * 管理员查看所以文件
+     *
+     * @param query
+     * @return
+     */
+    IPage<FileInfo> findAdminFileInfoListByPage(FileInfoQuery query);
 }
