@@ -100,8 +100,7 @@ public class AdminController {
      */
     @PostMapping("updateUserStatus")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
-    public Result updateUserStatus(@VerifyParam(required = true) String userId,
-                                   @VerifyParam(required = true) Integer status) {
+    public Result updateUserStatus(@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer status) {
         userInfoService.updateUserInfoStatus(userId, status);
         return Result.success();
     }
@@ -115,29 +114,35 @@ public class AdminController {
      */
     @PostMapping("/updateUserSpace")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
-    public Result updateUserSpace(@VerifyParam(required = true) String userId,
-                                  @VerifyParam(required = true) Integer changeSpace) {
+    public Result updateUserSpace(@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer changeSpace) {
         userInfoService.updateUserSpace(userId, changeSpace);
         return Result.success();
     }
 
     /**
      * 根据用户ID删除
+     *
      * @param session
      * @param userId
      * @return
      */
     @PostMapping("/deleteUser")
-    @GlobalInterceptor(checkParams = true,checkAdmin = true)
-    public Result deleteUser(HttpSession session, @VerifyParam(required = true) String userId){
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
+    public Result deleteUser(HttpSession session, @VerifyParam(required = true) String userId) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
-        userInfoService.deleteUser(sessionWebUserDto.getUserId(),userId);
+        userInfoService.deleteUser(sessionWebUserDto.getUserId(), userId);
         return Result.success();
     }
 
+    /**
+     * 查询所有文件
+     *
+     * @param query
+     * @return
+     */
     @PostMapping("/loadFileList")
-    @GlobalInterceptor(checkParams = true,checkAdmin = true)
-    public Result loadFileList(FileInfoQuery query){
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
+    public Result loadFileList(FileInfoQuery query) {
         IPage<FileInfo> fileInfoIPage = fileInfoService.findAdminFileInfoListByPage(query);
         FileInfoPageVO fileInfoPageVO = new FileInfoPageVO();
         fileInfoPageVO.setList(fileInfoIPage.getRecords());
