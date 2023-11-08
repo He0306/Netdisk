@@ -3,7 +3,7 @@
         <div class="top">
             <div class="top-op">
                 <div class="search-panel">
-                    <el-input v-model="fileNameFuzzy" clearable placeholder="请输入文件名搜索" @keyup.enter="search">
+                    <el-input v-model="fileNameFuzzy" clearable placeholder="请输入文件名/昵称搜索" @keyup.enter="search">
                         <template #suffix>
                             <i class="iconfont icon-search" @click="search"></i>
                         </template>
@@ -95,7 +95,7 @@ const route = useRoute()
 const {proxy} = getCurrentInstance()
 
 const api = {
-    loadDataList: "/admin/loadDataList",
+    loadDataList: "/admin/loadFileList",
     delFile: "/admin/delFile",
     createDownLoadUrl: "/admin/createDownLoadUrl",
     download: "/api/admin/download"
@@ -253,16 +253,16 @@ const columns = [
 <style lang="scss" scoped>
 @import "@/assets/file.list.scss";
 
-.search-panel {
-    margin-left: 0 !important;
-}
-.file-list {
-  margin-top: 10px;
-
-  .file-item {
-    .op {
-      width: 120px;
-    }
-  }
-}
+//.search-panel {
+//    margin-left: 0 !important;
+//}
+//.file-list {
+//  margin-top: 10px;
+//
+//  .file-item {
+//    .op {
+//      width: 120px;
+//    }
+//  }
+//}
 </style>
