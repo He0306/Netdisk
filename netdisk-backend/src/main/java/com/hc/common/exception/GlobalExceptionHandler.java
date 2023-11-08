@@ -1,5 +1,6 @@
 package com.hc.common.exception;
 
+import com.hc.common.enums.HttpCodeEnum;
 import com.hc.common.lang.Result;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,9 +16,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ServiceException.class)
     @ResponseBody
-    public Result handleException(ServiceException serviceException){
-        return Result.failure(serviceException.getStatus(),serviceException.getMessage());
+    public Result handleException(ServiceException serviceException) {
+        return Result.failure(serviceException.getStatus(), serviceException.getMessage());
     }
 
-
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    private Result exception(Exception e) {
+        return Result.failure(HttpCodeEnum.CODE_500.getStatus(), e.getMessage());
+    }
 }

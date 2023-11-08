@@ -19,4 +19,9 @@ public class ServiceException extends RuntimeException {
         this.status = httpCodeEnum.getStatus();
         this.message = httpCodeEnum.getMessage();
     }
+
+    public ServiceException(String message) {
+        this.status = HttpCodeEnum.CODE_500.getStatus();
+        this.message = message;
+    }
 }

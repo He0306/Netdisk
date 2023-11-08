@@ -18,6 +18,8 @@ public class Result<T> {
     private String message;
     private T data;
 
+    public Result(){}
+
     private Result(Integer status, boolean success, String message, T data) {
         this.status = status;
         this.success = success;

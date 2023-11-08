@@ -160,10 +160,8 @@ public class GlobalOperatcionAspect {
                 checkValue(resultValue, fieldVerifyParam);
             }
         } catch (ClassNotFoundException e) {
-            // todo
             throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            // todo
             throw new RuntimeException(e);
         }
     }
@@ -185,22 +183,19 @@ public class GlobalOperatcionAspect {
          * 校验是否为空
          */
         if (isEmpty) {
-            // TODO 为空
-            throw new RuntimeException("所传值不能为空");
+            throw new ServiceException(HttpCodeEnum.CODE_428);
         }
         /**
          * 校验长度
          */
         if ((verifyParam.max() != -1 && verifyParam.max() < length || verifyParam.min() != -1 && verifyParam.min() > length)) {
-            // TODO 长度不对
-            throw new RuntimeException("所传值长度不对");
+            throw new ServiceException(HttpCodeEnum.CODE_429);
         }
         /**
          * 校验正则
          */
         if (!VerifyRegexEnum.NO.equals(verifyParam.regex()) && !VerifyUtils.verify(verifyParam.regex(), String.valueOf(value))) {
-            //  正则校验不对
-            throw new RuntimeException("正则校验不对");
+            throw new ServiceException(HttpCodeEnum.CODE_430);
         }
     }
 }

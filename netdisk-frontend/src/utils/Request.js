@@ -66,7 +66,7 @@ instance.interceptors.response.use(
         if (error.config.showLoading && loading) {
             loading.close()
         }
-        return Promise.reject({showError: true, message: "网络异常！"})
+        return Promise.reject({showError: true, message: "系统异常，请联系管理员！"})
     }
 )
 

@@ -1,6 +1,7 @@
 package com.hc.controller;
 
 import com.hc.annotation.GlobalInterceptor;
+import com.hc.annotation.Limit;
 import com.hc.annotation.VerifyParam;
 import com.hc.common.enums.HttpCodeEnum;
 import com.hc.common.enums.VerifyRegexEnum;
@@ -80,6 +81,7 @@ public class AccountController {
      * @param type     0:登录注册 1:邮箱验证码发送 默认0
      * @throws IOException
      */
+    @Limit(key = "checkCode",permitsPerSecond = 1,timeout = 1)
     @GetMapping("/checkCode")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void checkCode(HttpServletResponse response, HttpSession session, @VerifyParam(required = true) Integer type) throws IOException {
@@ -106,6 +108,7 @@ public class AccountController {
      * @param type      类型 0:注册 1:找回密码
      * @return
      */
+    @Limit(key = "sendEmailCode",permitsPerSecond = 10,timeout = 1)
     @PostMapping("/sendEmailCode")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result sendEmailCode(HttpSession session,
@@ -134,6 +137,7 @@ public class AccountController {
      * @param emailCode 邮箱验证码
      * @return
      */
+    @Limit(key = "register",permitsPerSecond = 10,timeout = 1)
     @PostMapping("/register")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result register(HttpSession session,
@@ -162,11 +166,12 @@ public class AccountController {
      * @param checkCode 图片验证码
      * @return
      */
+    @Limit(key = "login", permitsPerSecond = 10, timeout = 1)
     @PostMapping("/login")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result login(HttpSession session,
                         @VerifyParam(required = true) String email,
-                        @VerifyParam(required = true,min = 8,max = 16,regex = VerifyRegexEnum.PASSWORD) String password,
+                        @VerifyParam(required = true, min = 8, max = 16, regex = VerifyRegexEnum.PASSWORD) String password,
                         @VerifyParam(required = true) String checkCode) {
         try {
             if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
@@ -352,6 +357,7 @@ public class AccountController {
      * @return
      * @throws UnsupportedEncodingException
      */
+    @Limit(key = "qqLogin",permitsPerSecond = 10,timeout = 1)
     @PostMapping("/qqlogin")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result qqlogin(HttpSession session, String callbackUrl) throws UnsupportedEncodingException {
@@ -365,6 +371,7 @@ public class AccountController {
 
     /**
      * 登录回调
+     *
      * @param session
      * @param code
      * @param state
@@ -375,10 +382,10 @@ public class AccountController {
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result qqlogin(HttpSession session, @VerifyParam(required = true) String code, @VerifyParam(required = true) String state) throws UnsupportedEncodingException {
         SessionWebUserDto sessionWebUserDto = userInfoService.qqLogin(code);
-        session.setAttribute(Constants.SESSION_KEY,sessionWebUserDto);
+        session.setAttribute(Constants.SESSION_KEY, sessionWebUserDto);
         Map<String, Object> map = new HashMap<>();
-        map.put("callbackUrl",session.getAttribute(state));
-        map.put("userInfo",sessionWebUserDto);
+        map.put("callbackUrl", session.getAttribute(state));
+        map.put("userInfo", sessionWebUserDto);
         return Result.success(map);
     }
 }

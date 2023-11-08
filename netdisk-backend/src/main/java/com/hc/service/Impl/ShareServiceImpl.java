@@ -15,7 +15,6 @@ import com.hc.mapper.ShareMapper;
 import com.hc.service.ShareService;
 import com.hc.utils.DateUtils;
 import com.hc.utils.RandomNumberUtil;
-import com.hc.utils.StringTools;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

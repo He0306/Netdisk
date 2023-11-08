@@ -19,7 +19,6 @@ import com.hc.mapper.FileInfoMapper;
 import com.hc.mapper.ShareMapper;
 import com.hc.mapper.UserInfoMapper;
 import com.hc.service.EmailCodeService;
-import com.hc.service.ShareService;
 import com.hc.service.UserInfoService;
 import com.hc.utils.JsonUtil;
 import com.hc.utils.MD5Util;
