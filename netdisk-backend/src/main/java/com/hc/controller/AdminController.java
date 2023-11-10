@@ -1,6 +1,7 @@
 package com.hc.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.github.pagehelper.PageInfo;
 import com.hc.annotation.GlobalInterceptor;
 import com.hc.annotation.VerifyParam;
 import com.hc.common.lang.Constants;
@@ -143,12 +144,12 @@ public class AdminController {
     @PostMapping("/loadFileList")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result loadFileList(FileInfoQuery query) {
-        IPage<FileInfo> fileInfoIPage = fileInfoService.findAdminFileInfoListByPage(query);
+        PageInfo<FileInfo> fileInfoIPage = fileInfoService.findAdminFileInfoListByPage(query);
         FileInfoPageVO fileInfoPageVO = new FileInfoPageVO();
-        fileInfoPageVO.setList(fileInfoIPage.getRecords());
+        fileInfoPageVO.setList(fileInfoIPage.getList());
         fileInfoPageVO.setPageNo(query.getPageNo());
         fileInfoPageVO.setPageSize(query.getPageSize());
-        fileInfoPageVO.setPageTotal(fileInfoIPage.getCurrent());
+        fileInfoPageVO.setPageTotal(Long.valueOf(fileInfoIPage.getPrePage()));
         fileInfoPageVO.setTotalCount(fileInfoIPage.getTotal());
         return Result.success(fileInfoPageVO);
     }

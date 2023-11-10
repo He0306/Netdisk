@@ -2,6 +2,7 @@ package com.hc.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.github.pagehelper.PageInfo;
 import com.hc.entity.FileInfo;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.dto.UploadResultDto;
@@ -137,5 +138,5 @@ public interface FileInfoService extends IService<FileInfo> {
      * @param query
      * @return
      */
-    IPage<FileInfo> findAdminFileInfoListByPage(FileInfoQuery query);
+    PageInfo<FileInfo> findAdminFileInfoListByPage(FileInfoQuery query);
 }

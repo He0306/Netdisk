@@ -18,6 +18,8 @@ public class FileInfoQuery extends BaseQuery{
 
     private String filePid;
 
+    private String nickName;
+
     private String fileIdFuzzy;
 
     private Integer folderType;
