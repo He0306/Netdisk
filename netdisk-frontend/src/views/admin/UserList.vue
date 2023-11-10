@@ -1,95 +1,98 @@
 <template>
     <div>
-        <div class="top-panel">
-            <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="100px" @submit.prevent>
-                <el-row>
-                    <el-col :span="6">
-                        <el-form-item label="用户昵称">
-                            <el-input clearable placeholder="请输入用户昵称"
-                                      v-model.trim="formData.nickName"
-                                      @keyup.native="loadDataList"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="6">
-                        <el-form-item label="状态">
-                            <el-select
-                                    clearable
-                                    placeholder="请选择状态"
-                                    v-model="formData.status">
-                                <el-option :value="1" label="启用"></el-option>
-                                <el-option :value="0" label="禁用"></el-option>
-                            </el-select>
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="4" style="margin-left: 10px">
-                        <el-button type="primary" @click="loadDataList" :icon="Search">搜索</el-button>
-                        <el-button type="warning" @click="rest" :icon="Refresh">重置</el-button>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <div class="file-list">
-                <Table
-                        ref="dataTableRef"
-                        :columns="columns"
-                        :dataSource="tableData"
-                        :fetch="loadDataList"
-                        :initFetch="true"
-                        :options="tableOptions"
-                        :showPagination="true"
-                >
-                    <template #avatar="{ index,row }">
-                        <div>
-                            <Avatar :userId="row.userId" :avatar="row.qqAvatar"></Avatar>
-                        </div>
-                    </template>
-                    <template #space="{ index,row }">
-                        {{ proxy.Utils.sizeToStr(row.userSpace) }} / {{ proxy.Utils.sizeToStr(row.totalSpace) }}
-                    </template>
-                    <template #status="{ index,row }">
-                        <span v-if="row.status === 1" style="color: #529b2e">启用</span>
-                        <span v-if="row.status === 0" style="color: #f56c62">禁用</span>
-                    </template>
-                    <template #op="{ index,row }">
-                        <span class="a-link" @click="updateSpace(row)">分配空间</span>
-                        <el-divider direction="vertical"></el-divider>
-                        <span class="a-link" @click="updateUserSpace(row)">
+        <div class="top">
+            <div class="top-panel">
+                <el-form :model="formData" :rules="rules" ref="formDataRef" label-width="100px" @submit.prevent>
+                    <el-row>
+                        <el-col :span="6">
+                            <el-form-item label="用户昵称">
+                                <el-input clearable placeholder="请输入用户昵称"
+                                          v-model.trim="formData.nickName"
+                                          @keyup.native="loadDataList"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="6">
+                            <el-form-item label="状态">
+                                <el-select
+                                        clearable
+                                        placeholder="请选择状态"
+                                        v-model="formData.status">
+                                    <el-option :value="1" label="启用"></el-option>
+                                    <el-option :value="0" label="禁用"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="4" style="margin-left: 10px">
+                            <el-button type="primary" @click="loadDataList" :icon="Search">搜索</el-button>
+                            <el-button type="warning" @click="rest" :icon="Refresh">重置</el-button>
+                        </el-col>
+                    </el-row>
+                </el-form>
+                <div class="file-list">
+                    <Table
+                            ref="dataTableRef"
+                            :columns="columns"
+                            :dataSource="tableData"
+                            :fetch="loadDataList"
+                            :initFetch="true"
+                            :options="tableOptions"
+                            :showPagination="true"
+                    >
+                        <template #avatar="{ index,row }">
+                            <div>
+                                <Avatar :userId="row.userId" :avatar="row.qqAvatar"></Avatar>
+                            </div>
+                        </template>
+                        <template #space="{ index,row }">
+                            {{ proxy.Utils.sizeToStr(row.userSpace) }} / {{ proxy.Utils.sizeToStr(row.totalSpace) }}
+                        </template>
+                        <template #status="{ index,row }">
+                            <span v-if="row.status === 1" style="color: #529b2e">启用</span>
+                            <span v-if="row.status === 0" style="color: #f56c62">禁用</span>
+                        </template>
+                        <template #op="{ index,row }">
+                            <span class="a-link" @click="updateSpace(row)">分配空间</span>
+                            <el-divider direction="vertical"></el-divider>
+                            <span class="a-link" @click="updateUserSpace(row)">
                             {{ row.status === 0 ? "启用" : "禁用" }}
                         </span>
-                        <el-divider direction="vertical"></el-divider>
-                        <el-link type="danger" :underline="false" @click="deleteUser(row)">删除</el-link>
-                    </template>
-                </Table>
-            </div>
+                            <el-divider direction="vertical"></el-divider>
+                            <el-link type="danger" :underline="false" @click="deleteUser(row)">删除</el-link>
+                        </template>
+                    </Table>
+                </div>
 
-            <div>
-                <!--  弹窗  -->
-                <el-dialog v-model="dialogFormVisible" title="修改头像" width="450" center>
-                    <el-form label-width="100px" label-position="right" :model="form" ref="formRef" :rules="formRules">
-                        <el-form-item label="昵称">
-                            {{ form.nickName }}
-                        </el-form-item>
-                        <el-form-item label="空间大小" prop="changeSpace">
-                            <el-input
-                                    clearable
-                                    placeholder="请输入空间大小"
-                                    v-model.number="form.changeSpace">
-                                <template #suffix>MB</template>
-                            </el-input>
-                        </el-form-item>
-                    </el-form>
-                    <template #footer>
+                <div>
+                    <!--  弹窗  -->
+                    <el-dialog v-model="dialogFormVisible" title="修改头像" width="450" center>
+                        <el-form label-width="100px" label-position="right" :model="form" ref="formRef"
+                                 :rules="formRules">
+                            <el-form-item label="昵称">
+                                {{ form.nickName }}
+                            </el-form-item>
+                            <el-form-item label="空间大小" prop="changeSpace">
+                                <el-input
+                                        clearable
+                                        placeholder="请输入空间大小"
+                                        v-model.number="form.changeSpace">
+                                    <template #suffix>MB</template>
+                                </el-input>
+                            </el-form-item>
+                        </el-form>
+                        <template #footer>
                         <span class="dialog-footer">
                              <el-button type="primary" @click="submitForm">确定</el-button>
                         </span>
-                    </template>
-                </el-dialog>
+                        </template>
+                    </el-dialog>
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-import { Search, Refresh } from '@element-plus/icons-vue'
+import {Search, Refresh} from '@element-plus/icons-vue'
 import {getCurrentInstance, nextTick, ref} from "vue";
 import Table from "@/components/Table.vue";
 import Avatar from "@/components/Avatar.vue";
@@ -247,5 +250,8 @@ const columns = [
 <style lang="scss" scoped>
 .top-panel {
   margin-top: 10px;
+}
+.top{
+    margin-top: 20px;
 }
 </style>
