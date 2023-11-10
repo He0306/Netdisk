@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.hc.common.enums.*;
 import com.hc.common.exception.ServiceException;
 import com.hc.common.lang.Constants;
@@ -180,17 +182,10 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
      * @return
      */
     @Override
-    public IPage<FileInfo> findAdminFileInfoListByPage(FileInfoQuery query) {
-        Page<FileInfo> page = new Page<>(query.getPageNo(), query.getPageSize());
-        LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.orderByDesc(FileInfo::getLastUpdateTime);
-        Page<FileInfo> infoPage = fileInfoMapper.selectPage(page, wrapper);
-        for (FileInfo record : infoPage.getRecords()) {
-            LambdaQueryWrapper<UserInfo> queryWrapper = new LambdaQueryWrapper<>();
-            queryWrapper.eq(UserInfo::getUserId, record.getUserId());
-            record.setNickName(userInfoMapper.selectOne(queryWrapper).getNickName());
-        }
-        return infoPage;
+    public PageInfo<FileInfo> findAdminFileInfoListByPage(FileInfoQuery query) {
+        PageHelper.startPage(query.getPageNo().intValue(), query.getPageSize().intValue());
+        List<FileInfo> list = fileInfoMapper.queryAdminList(query);
+        return new PageInfo<>(list);
     }
 
     /**

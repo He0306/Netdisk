@@ -22,8 +22,8 @@
                         </el-form-item>
                     </el-col>
                     <el-col :span="4" style="margin-left: 10px">
-                        <el-button type="primary" @click="loadDataList">搜索</el-button>
-                        <el-button type="warning" @click="rest">重置</el-button>
+                        <el-button type="primary" @click="loadDataList" :icon="Search">搜索</el-button>
+                        <el-button type="warning" @click="rest" :icon="Refresh">重置</el-button>
                     </el-col>
                 </el-row>
             </el-form>
@@ -89,6 +89,7 @@
 </template>
 
 <script setup>
+import { Search, Refresh } from '@element-plus/icons-vue'
 import {getCurrentInstance, nextTick, ref} from "vue";
 import Table from "@/components/Table.vue";
 import Avatar from "@/components/Avatar.vue";

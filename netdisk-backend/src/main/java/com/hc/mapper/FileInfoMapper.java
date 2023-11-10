@@ -2,6 +2,7 @@ package com.hc.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.hc.entity.FileInfo;
+import com.hc.entity.query.FileInfoQuery;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -43,6 +44,7 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
 
     /**
      * 更加fileIds 或者 filePids 批量更新
+     *
      * @param fileInfo
      * @param fileIds
      * @param filePids
@@ -51,13 +53,23 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
 
     /**
      * 更加userId fileId进行更新
+     *
      * @param fileInfo
      */
     void updateByUserAndFileId(FileInfo fileInfo);
 
     /**
      * 根据用户ID删除
+     *
      * @param userId
      */
     void deleteByUserId(@Param("userId") String userId);
+
+    /**
+     * 管理员查询所有文件
+     *
+     * @param query
+     * @return
+     */
+    List<FileInfo> queryAdminList(@Param("query") FileInfoQuery query);
 }

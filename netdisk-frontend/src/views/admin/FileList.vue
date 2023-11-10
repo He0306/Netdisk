@@ -2,15 +2,26 @@
     <div>
         <div class="top">
             <div class="top-op">
-                <div class="search-panel">
-                    <el-input v-model="fileNameFuzzy" clearable placeholder="请输入文件名/昵称搜索" @keyup.enter="search">
-                        <template #suffix>
-                            <i class="iconfont icon-search" @click="search"></i>
-                        </template>
-                    </el-input>
-                </div>
-                <div class="iconfont icon-refresh" @click="loadDataList"></div>
-                <el-button :style="{ 'margin-left': '10px' }" :disabled="selectFileIdList.length === 0" type="danger" @click="delFileBatch">
+                <el-row>
+                    <el-col :span="12">
+                        <el-input v-model="fileName" clearable placeholder="请输入文件名搜索" @keyup.enter="search">
+                            <template #suffix>
+                                <i class="iconfont icon-search" @click="search"></i>
+                            </template>
+                        </el-input>
+                    </el-col>
+                    <el-col :span="12">
+                        <el-input style="margin-left: 5px" v-model="nickName" clearable placeholder="请输入昵称搜索" @keyup.enter="search">
+                            <template #suffix>
+                                <i class="iconfont icon-search" @click="search"></i>
+                            </template>
+                        </el-input>
+                    </el-col>
+                </el-row>
+                <el-button style="margin-left: 10px" type="primary" @click="loadDataList" :icon="Search">搜索</el-button>
+                <el-button style="margin-left: 10px" type="warning" @click="loadDataList" :icon="Refresh">重置</el-button>
+                <el-button :style="{ 'margin-left': '10px' }" :disabled="selectFileIdList.length === 0" type="danger"
+                           @click="delFileBatch">
                     <span class="iconfont icon-del"></span>
                     批量删除
                 </el-button>
@@ -89,6 +100,7 @@ import {getCurrentInstance, ref} from "vue";
 import Icon from "@/components/Icon.vue";
 import Navigation from "@/components/Navigation.vue";
 import Preview from "@/components/preview/Preview.vue";
+import {Refresh, Search} from "@element-plus/icons-vue";
 
 const router = useRouter()
 const route = useRoute()
@@ -108,13 +120,15 @@ const tableOptions = ref({
     extHeight: 50,
     selectType: "checkbox"
 })
-const fileNameFuzzy = ref();
+const fileName = ref();
+const nickName = ref();
 const showLoading = ref(true)
 const loadDataList = async () => {
     let params = {
         pageNo: tableData.value.pageNo,
         pageSize: tableData.value.pageSize,
-        fileNameFuzzy: fileNameFuzzy.value
+        fileName: fileName.value,
+        nickName: nickName.value
     }
     let result = await proxy.Request({
         url: api.loadDataList,
@@ -129,7 +143,7 @@ const loadDataList = async () => {
 // 当前目录
 const currentFolder = ref({fileId: 0})
 const navChange = (data) => {
-    const { curFolder} = data
+    const {curFolder} = data
     currentFolder.value = curFolder
     showLoading.value = true
     loadDataList()
