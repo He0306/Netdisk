@@ -185,11 +185,15 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     /**
      * 根据用户ID更新用户状态
      *
+     * @param currentUserId
      * @param userId
      * @param status
      */
     @Override
-    public void updateUserInfoStatus(String userId, Integer status) {
+    public void updateUserInfoStatus(String currentUserId,String userId, Integer status) {
+        if (currentUserId.equals(userId)){
+            throw new ServiceException(HttpCodeEnum.CODE_427);
+        }
         UserInfo userInfo = new UserInfo();
         userInfo.setUserId(userId);
         userInfo.setStatus(status);

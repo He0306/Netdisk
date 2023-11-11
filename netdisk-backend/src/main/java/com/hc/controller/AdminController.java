@@ -95,14 +95,16 @@ public class AdminController {
     /**
      * 修改用户状态
      *
+     * @param session
      * @param userId
      * @param status
      * @return
      */
-    @PostMapping("updateUserStatus")
+    @PostMapping("/updateUserStatus")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
-    public Result updateUserStatus(@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer status) {
-        userInfoService.updateUserInfoStatus(userId, status);
+    public Result updateUserStatus(HttpSession session,@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer status) {
+        SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+        userInfoService.updateUserInfoStatus(sessionWebUserDto.getUserId(),userId, status);
         return Result.success();
     }
 

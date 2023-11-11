@@ -59,10 +59,11 @@ public interface UserInfoService extends IService<UserInfo> {
     /**
      * 根据用户ID更新用户状态
      *
+     * @param currentUserId
      * @param userId
      * @param status
      */
-    void updateUserInfoStatus(String userId, Integer status);
+    void updateUserInfoStatus(String currentUserId,String userId, Integer status);
 
     /**
      * 更新用户空间
