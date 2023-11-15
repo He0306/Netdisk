@@ -53,7 +53,7 @@ instance.interceptors.response.use(
         } else if (responseData.status === 901) {
             // 登录超时
             router.push("/login?redirectUrl=" + encodeURI(router.currentRoute.value.path));
-            return Promise.reject({showError: false, message: "登录超时！"})
+            return Promise.reject({showError: false, message: "登录超时，请重新登录！"})
         } else {
             // 其他错误
             if (errorCallback) {
@@ -97,10 +97,10 @@ const request = (config) => {
         showError: config.showError
     }).catch(error => {
         console.log(error)
-        if (error.showError) {
+        if (!error.showError) {
             Message.error(error.message)
         }
-        return null;
+        Message.error(error.message)
     })
 }
 export default request
