@@ -82,7 +82,7 @@ public class GlobalOperatcionAspect {
     }
 
     /**
-     * 校验是否登录
+     * 校验是否登录、是否是管理员
      * @param checkAdmin
      */
     private void checkLogin(Boolean checkAdmin) {

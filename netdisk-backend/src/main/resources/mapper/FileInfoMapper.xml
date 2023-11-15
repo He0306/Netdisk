@@ -110,6 +110,7 @@
     <select id="queryAdminList" resultType="com.hc.entity.FileInfo">
         select * from tb_file_info a,tb_user_info b
         <where>
+            and a.user_id = b.user_id
             <if test="query.fileName != null and query.fileName !=''">
                 and a.file_name like concat('%',#{query.fileName},'%')
             </if>

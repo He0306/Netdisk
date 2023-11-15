@@ -2,4 +2,4 @@ server:
   port: 7090
 spring:
   profiles:
-    active: prod
+    active: dev
