@@ -37,7 +37,7 @@ spring:
     port: 587   # 配置邮件服务器的端口（465或587
     host: smtp.qq.com   # 配置邮件服务器的地址 smtp.qq.com
     username: 2740860037@qq.com   # 配置用户的账号
-    password: aczotlkbphomdchd   # 配置用户的密码
+    password:    # 配置用户的密码
     default-encoding: UTF-8    # 配置默认编码
     properties: # SSL 连接配置
       mail:
@@ -67,7 +67,7 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
 ## 日志目录
 project:
-  folder: E:/大学自学/程序员老罗/云盘/
+  folder:
 ## 日志级别配置
 #log:
 #  root:
@@ -75,8 +75,8 @@ project:
 # qq登陆相关
 qq:
   app:
-    id: 102055758
-    key: Y0EITXS4XBey4xc2
+    id:
+    key:
   url:
     authorization: https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s
     openid: https://graph.qq.com/oauth2.0/me?access_token=%S

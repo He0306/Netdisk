@@ -12,9 +12,9 @@ spring:
       add-mappings: false
   # 数据库配置
   datasource:
-    url: jdbc:mysql://47.98.240.56:3306/pan?useSSL=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://ip:3306/pan?useSSL=true&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2B8
     username: root
-    password: Hc020310..
+    password: 123456
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       pool-name: HikariCPDatasource
@@ -37,7 +37,7 @@ spring:
     port: 587   # 配置邮件服务器的端口（465或587
     host: smtp.qq.com   # 配置邮件服务器的地址 smtp.qq.com
     username: 2740860037@qq.com   # 配置用户的账号
-    password: aczotlkbphomdchd   # 配置用户的密码
+    password:    # 配置用户的密码
     default-encoding: UTF-8    # 配置默认编码
     properties: # SSL 连接配置
       mail:
@@ -47,7 +47,7 @@ spring:
         debug: true    # 开启 debug，这样方便开发者查看邮件发送日志
   # Spring redis配置
   redis:
-    host: 47.98.240.56
+    host: ip
     port: 6379
     database: 0
     timeout: 2000    # 连接超时时间（毫秒）
@@ -76,8 +76,8 @@ project:
 # qq登陆相关
 qq:
   app:
-    id: 102055758
-    key: Y0EITXS4XBey4xc2
+    id:
+    key:
   url:
     authorization: https://graph.qq.com/oauth2.0/authorize?response_type=code&client_id=%s&redirect_uri=%s&state=%s
     openid: https://graph.qq.com/oauth2.0/me?access_token=%S
