@@ -190,7 +190,7 @@ const delFileBatch = () => {
     if (selectFileIdList.value.length === 0) {
         return;
     }
-    proxy.Confirm(`你确定要删除这些文件吗？删除的文件可在10天内通过回收站还原`,
+    proxy.Confirm(`你确定要删除这些文件吗？此操作将不可撤销`,
         async () => {
             let result = await proxy.Request({
                 url: api.delFile,
@@ -207,7 +207,7 @@ const delFileBatch = () => {
 }
 // 单删除
 const delFile = (row) => {
-    proxy.Confirm(`你确定删除【${row.fileName}】吗？删除的文件可在10天内通过回收站还原`,
+    proxy.Confirm(`你确定删除【${row.fileName}】吗？此操作将不可撤销`,
         async () => {
             let result = await proxy.Request({
                 url: api.delFile,
