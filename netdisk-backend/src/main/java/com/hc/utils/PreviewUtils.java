@@ -5,6 +5,7 @@ import com.hc.common.enums.FileCategoryEnum;
 import com.hc.common.lang.Constants;
 import com.hc.entity.FileInfo;
 import com.hc.service.FileInfoService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -131,7 +132,9 @@ public class PreviewUtils {
     public List<FileInfo> getFolderInfo(String path, String userId) {
         String[] pathArray = path.split("/");
         LambdaQueryWrapper<FileInfo> fileQueryWrapper = new LambdaQueryWrapper<>();
-        fileQueryWrapper.eq(FileInfo::getUserId, userId);
+        if (!StringUtils.isEmpty(userId)){
+            fileQueryWrapper.eq(FileInfo::getUserId, userId);
+        }
         fileQueryWrapper.in(FileInfo::getFileId, pathArray);
         fileQueryWrapper.select(FileInfo::getFileName, FileInfo::getFileId);
         List<FileInfo> selectFiles = fileInfoService.list(fileQueryWrapper);

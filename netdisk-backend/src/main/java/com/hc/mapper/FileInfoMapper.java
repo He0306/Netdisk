@@ -43,7 +43,7 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
     void updateByFileIdAndUserId(FileInfo dbFileInfo);
 
     /**
-     * 更加fileIds 或者 filePids 批量更新
+     * 更新fileIds 或者 filePids 批量更新
      *
      * @param fileInfo
      * @param fileIds
@@ -72,4 +72,13 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
      * @return
      */
     List<FileInfo> queryAdminList(@Param("query") FileInfoQuery query);
+
+    /**
+     * 彻底删除
+     *
+     * @param userId
+     * @param filePidList
+     * @param fileIdList
+     */
+    void delFileBatch(@Param("userId") String userId, @Param("filePidList") List<String> filePidList,@Param("fileIdList") List<String> fileIdList);
 }

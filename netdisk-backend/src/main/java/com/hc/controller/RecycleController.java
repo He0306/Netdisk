@@ -77,7 +77,7 @@ public class RecycleController {
     @GlobalInterceptor
     public Result delFile(HttpSession session, @VerifyParam(required = true) String fileIds) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
-        fileInfoService.recoverFileBatch(sessionWebUserDto.getUserId(), fileIds);
+        fileInfoService.delFileBatch(sessionWebUserDto.getUserId(), fileIds);
         return Result.success();
     }
 

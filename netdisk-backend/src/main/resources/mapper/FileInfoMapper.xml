@@ -101,6 +101,17 @@
         delete from tb_file_info where user_id = #{userId}
     </delete>
 
+    <delete id="delFileBatch">
+        delete from tb_file_info
+        where user_id = #{userId}
+        <if test="fileIdList != null">
+            and file_id in (<foreach collection="fileIdList" separator="," item="item">#{item}</foreach>)
+        </if>
+        <if test="filePidList != null">
+            and file_pid in (<foreach collection="filePidList" separator="," item="item">#{item}</foreach>)
+        </if>
+    </delete>
+
     <select id="selectUserSpace" resultType="java.lang.Long">
         select ifnull(sum(file_size), 0)
         from tb_file_info
@@ -111,6 +122,9 @@
         select * from tb_file_info a,tb_user_info b
         <where>
             and a.user_id = b.user_id
+            <if test="query.filePid != null and query.filePid !=''">
+                and a.file_pid = #{query.filePid}
+            </if>
             <if test="query.fileName != null and query.fileName !=''">
                 and a.file_name like concat('%',#{query.fileName},'%')
             </if>

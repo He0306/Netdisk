@@ -10,11 +10,15 @@ class EasyPanBackApplicationTests {
 
     @Test
     void contextLoads() {
-        TimeZone timeZone = TimeZone.getDefault();
-        if (timeZone.getID().equals("UTC")){
-            System.out.println(11);
-        }else {
-            System.out.println(22);
+        String userid = "1667464398215524354_l3xIrn4QVy,1722255333935493122_XghNOI8kw0";
+        String[] split = userid.split(",");
+        for (String s : split) {
+            String[] split1 = s.split("_");
+            System.out.println(s);
+            for (String s1 : split1) {
+                System.out.println(s1);
+            }
+
         }
     }
 

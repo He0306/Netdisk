@@ -17,12 +17,15 @@ import com.hc.entity.vo.FileInfoPageVO;
 import com.hc.entity.vo.UserInfoPageVO;
 import com.hc.service.FileInfoService;
 import com.hc.service.UserInfoService;
+import com.hc.utils.PreviewUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 /**
  * @author: hec
@@ -42,6 +45,9 @@ public class AdminController {
 
     @Autowired
     UserInfoService userInfoService;
+
+    @Autowired
+    PreviewUtils previewUtils;
 
     /**
      * 获取系统设置信息
@@ -154,5 +160,88 @@ public class AdminController {
         fileInfoPageVO.setPageTotal(Long.valueOf(fileInfoIPage.getPrePage()));
         fileInfoPageVO.setTotalCount(fileInfoIPage.getTotal());
         return Result.success(fileInfoPageVO);
+    }
+
+    /**
+     * 预览文件
+     *
+     * @param response
+     * @param userId
+     * @param fileId
+     */
+    @RequestMapping("/getFile/{userId}/{fileId}")
+    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    public void getFile(HttpServletResponse response,
+                        @PathVariable("userId") String userId,
+                        @PathVariable("fileId") String fileId) {
+        previewUtils.getFile(response, fileId, userId);
+    }
+
+    /**
+     * 视频预览
+     *
+     * @param response
+     * @param userId
+     * @param fileId
+     */
+    @GetMapping("/ts/getVideoInfo/{userId}/{fileId}")
+    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    public void getVideo(HttpServletResponse response,
+                         @PathVariable("userId") String userId,
+                         @PathVariable("fileId") String fileId) {
+        previewUtils.getVideo(response, fileId, userId);
+    }
+
+    /**
+     * 获取对应文件夹的信息
+     *
+     * @param path
+     * @return
+     */
+    @PostMapping("/getFolderInfo")
+    @GlobalInterceptor(checkParams = true)
+    public Result newFolder(@VerifyParam(required = true) String path) {
+        List<FileInfo> folderInfo = previewUtils.getFolderInfo(path, null);
+        return Result.success(folderInfo);
+    }
+
+    /**
+     * 创建下载链接
+     *
+     * @param userId
+     * @param fileId
+     * @return
+     */
+    @PostMapping("/createDownLoadUrl/{userId}/{fileId}")
+    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    public Result createDownLoadUrl(@VerifyParam(required = true) @PathVariable(value = "fileId") String fileId,
+                                    @PathVariable("userId") String userId) {
+        String code = fileInfoService.createDownLoadUrl(fileId, userId);
+        return Result.success(code);
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param response
+     * @param request
+     * @param code
+     * @throws UnsupportedEncodingException
+     */
+    @GetMapping("/download/{code}")
+    @GlobalInterceptor(checkParams = true, checkLogin = false)
+    public void download(HttpServletResponse response, HttpServletRequest request, @VerifyParam(required = true) @PathVariable(value = "code") String code) throws UnsupportedEncodingException {
+        fileInfoService.download(request, response, code);
+    }
+
+    @PostMapping("")
+    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    public Result adminDelete(@VerifyParam(required = true) String fileIdAndUserIds){
+        String[] fileIdAndUserIdsArray = fileIdAndUserIds.split(",");
+        for (String fileIdAndUserId : fileIdAndUserIdsArray) {
+            String[] itemArray = fileIdAndUserId.split("_");
+            fileInfoService.delFileBatch(itemArray[0],itemArray[1]);
+        }
+        return Result.success();
     }
 }

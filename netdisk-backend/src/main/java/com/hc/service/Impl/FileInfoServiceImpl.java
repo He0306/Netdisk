@@ -11,6 +11,7 @@ import com.hc.common.exception.ServiceException;
 import com.hc.common.lang.Constants;
 import com.hc.component.RedisComponent;
 import com.hc.entity.FileInfo;
+import com.hc.entity.Share;
 import com.hc.entity.UserInfo;
 import com.hc.entity.dto.DownLoadFileDto;
 import com.hc.entity.dto.SessionWebUserDto;
@@ -18,6 +19,7 @@ import com.hc.entity.dto.UploadResultDto;
 import com.hc.entity.dto.UserSpaceDto;
 import com.hc.entity.query.FileInfoQuery;
 import com.hc.mapper.FileInfoMapper;
+import com.hc.mapper.ShareMapper;
 import com.hc.mapper.UserInfoMapper;
 import com.hc.service.FileInfoService;
 import com.hc.utils.*;
@@ -73,6 +75,9 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
     @Autowired
     @Lazy
     FileInfoServiceImpl fileInfoService;
+
+    @Autowired
+    ShareMapper shareMapper;
 
 
     /**
@@ -193,12 +198,53 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
      *
      * @param userId
      * @param fileIds
-     * @param adminOp
      */
     @Override
-    public void delFileBatch(String userId, String fileIds, Boolean adminOp) {
+    public void delFileBatch(String userId, String fileIds) {
         String[] fileIdArray = fileIds.split(",");
+        LambdaQueryWrapper<Share> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Share::getUserId, userId).in(Share::getFileId, fileIdArray);
+        Long count = shareMapper.selectCount(queryWrapper);
+        if (count > 0) {
+            throw new ServiceException(HttpCodeEnum.CODE_431);
+        }
+        LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(FileInfo::getUserId, userId).in(FileInfo::getFileId, fileIdArray).eq(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag());
+        List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
 
+        List<String> delFileSubFileFolderFileIdList = new ArrayList<>();
+        // 找到所选文件子目录文件ID
+        for (FileInfo fileInfo : fileInfoList) {
+            if (FileFolderTypeEnum.FOLDER.getType().equals(fileInfo.getFolderType())) {
+                findAllSubFolderFileList(delFileSubFileFolderFileIdList, userId, fileInfo.getFileId(), FileDelFlagEnum.RECYCLE.getFlag());
+            }
+        }
+        // 更新用户使用空间
+        Long useSpace = fileInfoMapper.selectUserSpace(userId);
+        UserInfo userInfo = new UserInfo();
+        userInfo.setUserId(userId);
+        userInfo.setUserSpace(useSpace);
+        userInfoMapper.updateById(userInfo);
+        // 删除服务器文件
+        for (FileInfo fileInfo : fileInfoList) {
+            // 不删除秒传文件
+            LambdaQueryWrapper<FileInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.in(FileInfo::getFileMd5,fileInfo.getFileMd5());
+            Long selectCount = fileInfoMapper.selectCount(lambdaQueryWrapper);
+            if (selectCount == 0) {
+                new File(projectFolder + Constants.FILE_FOLDER_FILE + fileInfo.getFilePath()).delete();
+            }
+        }
+        // 删除所有选中文件目录下的文件
+        if (!delFileSubFileFolderFileIdList.isEmpty()) {
+            fileInfoMapper.delFileBatch(userId, delFileSubFileFolderFileIdList, null);
+        }
+        // 删除文件
+        fileInfoMapper.delFileBatch(userId, null, Arrays.asList(fileIdArray));
+        // 设置缓存
+        UserSpaceDto spaceDto = redisComponent.getUserSpaceDto(userId);
+        spaceDto.setUseSpace(useSpace);
+        redisComponent.saveUserSpaceUse(userId,spaceDto);
     }
 
     /**
@@ -219,7 +265,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
             throw new ServiceException(HttpCodeEnum.CODE_421);
         }
         LambdaQueryWrapper<FileInfo> countWrapper = new LambdaQueryWrapper<>();
-        countWrapper.eq(FileInfo::getFileName, fileName);
+        countWrapper.eq(FileInfo::getFileName, fileName).eq(FileInfo::getDelFlag,FileDelFlagEnum.USING.getFlag());
         Long count = fileInfoMapper.selectCount(countWrapper);
         if (count > 1) {
             throw new ServiceException(HttpCodeEnum.CODE_422);
@@ -306,6 +352,12 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
     @Override
     public void removeFile2RecycleBatch(String userId, String fileIds) {
         String[] fileIdArray = fileIds.split(",");
+        LambdaQueryWrapper<Share> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(Share::getUserId, userId).in(Share::getFileId, fileIdArray);
+        Long count = shareMapper.selectCount(queryWrapper);
+        if (count > 0) {
+            throw new ServiceException(HttpCodeEnum.CODE_431);
+        }
         LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FileInfo::getUserId, userId).in(FileInfo::getFileId, fileIdArray).eq(FileInfo::getDelFlag, FileDelFlagEnum.USING.getFlag());
         List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
@@ -589,6 +641,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         wrapper.eq(FileInfo::getFileName, fileName);
         wrapper.eq(FileInfo::getFilePid, filePid);
         wrapper.eq(FileInfo::getUserId, userId);
+        wrapper.eq(FileInfo::getDelFlag,FileDelFlagEnum.USING.getFlag());
         Long count = fileInfoMapper.selectCount(wrapper);
         if (count > 0) {
             throw new ServiceException(HttpCodeEnum.CODE_420);
