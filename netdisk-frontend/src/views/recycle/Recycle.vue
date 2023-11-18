@@ -142,7 +142,7 @@ const emit = defineEmits(["reload"])
 const delFile = (row) => {
     proxy.Confirm(`你确定要删除【${row.fileName}】吗？`,async ()=>{
         let result = await proxy.Request({
-            url: api.recoverFile,
+            url: api.delFile,
             params: {
                 fileIds: row.fileId
             }
@@ -158,7 +158,7 @@ const delFile = (row) => {
 const delBatch = () => {
     proxy.Confirm(`你确定要删除这些文件吗？`,async ()=>{
         let result = await proxy.Request({
-            url: api.recoverFile,
+            url: api.delFile,
             params: {
                 fileIds: selectFileIdList.value.join(",")
             }

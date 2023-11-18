@@ -52,25 +52,11 @@
                             <Icon v-if="row.folderType === 0" :fileType="row.fileType" @click="preview(row)"></Icon>
                             <Icon v-if="row.folderType === 1" :fileType="0" @click="preview(row)"></Icon>
                         </template>
-                        <span v-if="!row.showEdit" :title="row.fileName" class="file-name">
+                        <span :title="row.fileName" class="file-name">
                           <span @click="preview(row)">{{ row.fileName }}</span>
                           <span v-if="row.status === 0" class="transfer-status">转码中</span>
                           <span v-if="row.status === 1" class="transfer-status transfer-fail">转码失败</span>
                         </span>
-                        <div v-if="row.showEdit" class="edit-panel">
-                            <el-input
-                                    v-model.trim="row.fileNameReal"
-                                    ref="editNameRef"
-                                    :maxLength="190"
-                                    @keyup.enter="saveNameEdit(index)"
-                            >
-                                <template #suffix>{{ row.fileSuffix }}</template>
-                            </el-input>
-                            <span :class="['iconfont icon-right1',row.fileNameReal ? '' : 'not-allow']"
-                                  @click="saveNameEdit(index)">
-                            </span>
-                            <span class="iconfont icon-error" @click="cancelNameEdit(index)"></span>
-                        </div>
                         <span class="op">
                           <template v-if="row.showOp && row.fileId && row.status===2">
                             <span v-if="row.folderType === 0" class="iconfont icon-download"
@@ -80,7 +66,10 @@
                         </span>
                     </div>
                 </template>
-
+                <template #delFlag="{ index,row }">
+                    <span v-if="row.delFlag === 1" style="color: #f56c62">回收站</span>
+                    <span v-if="row.delFlag === 2" style="color: #529b2e">使用中</span>
+                </template>
                 <template #fileSize="{index,row}">
                     <span v-if="row.fileSize">{{ proxy.Utils.sizeToStr(row.fileSize) }}</span>
                 </template>
@@ -128,7 +117,8 @@ const loadDataList = async () => {
         pageNo: tableData.value.pageNo,
         pageSize: tableData.value.pageSize,
         fileName: fileName.value,
-        nickName: nickName.value
+        nickName: nickName.value,
+        filePid: currentFolder.value.fileId,
     }
     let result = await proxy.Request({
         url: api.loadDataList,
@@ -249,6 +239,12 @@ const columns = [
         label: "发布人",
         prop: "nickName",
         width: 200
+    },
+    {
+        label: "状态",
+        prop: "delFlag",
+        scopedSlots: "delFlag",
+        width: 100
     },
     {
         label: "修改时间",
