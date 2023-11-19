@@ -163,6 +163,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         FileInfo fileInfo = new FileInfo();
         fileInfo.setDelFlag(FileDelFlagEnum.USING.getFlag());
         fileInfo.setFilePid(Constants.ZERO_STR);
+        fileInfo.setUserId(userId);
         fileInfo.setLastUpdateTime(new Date());
         fileInfoMapper.updateFileDelFlagBatch(fileInfo, delFileIdList, null);
         // 将所选文件重命名
