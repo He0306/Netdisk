@@ -216,6 +216,7 @@ const delFileBatch = () => {
             if (!result) {
                 return;
             }
+            proxy.Message.success("删除成功！")
             await loadDataList()
         }
     )
@@ -233,6 +234,7 @@ const delFile = (row) => {
             if (!result) {
                 return;
             }
+            proxy.Message.success("删除成功！")
             await loadDataList()
         }
     )
@@ -273,6 +275,7 @@ const moveFolderDone = async (folderId) => {
         return;
     }
     folderSelectRef.value.close()
+    proxy.Message.success("移动成功！")
     await loadDataList()
 }
 
@@ -344,6 +347,7 @@ const saveNameEdit = async (index) => {
         return;
     }
     tableData.value.list[index] = result.data
+    proxy.Message.success("操作成功！")
     editing.value = false
 }
 

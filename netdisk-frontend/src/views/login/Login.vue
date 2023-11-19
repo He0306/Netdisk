@@ -199,7 +199,7 @@ const sendEmailCode = () => {
     if (!result) {
       return
     }
-    proxy.Message.success("验证码发送成功，请登录邮箱查看")
+    proxy.Message.success("验证码发送成功，请登录邮箱查看！")
     dialogFormVisible.value = false
   })
 }
@@ -306,7 +306,7 @@ const doSubmit = () => {
     }
     // 注册返回
     if (opType.value === 0) {
-      proxy.Message.success("注册成功，请登录")
+      proxy.Message.success("注册成功，请登录！")
       showPanel(1)
     } else if (opType.value === 1) {
       if (params.rememberMe) {
@@ -327,7 +327,7 @@ const doSubmit = () => {
       router.push(redirectUrl)
     } else if (opType.value === 2) {
       // 重置密码
-      proxy.Message.success("重置密码成功，请登录")
+      proxy.Message.success("重置密码成功，请登录！")
       showPanel(1)
     }
   })

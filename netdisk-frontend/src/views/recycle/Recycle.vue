@@ -119,6 +119,7 @@ const revert = (row) => {
       if (!result){
           return
       }
+      proxy.Message.success("还原成功！")
       await loadDataList()
   })
 }
@@ -134,6 +135,7 @@ const revertBatch = () => {
         if (!result){
             return
         }
+        proxy.Message.success("还原成功！")
         await loadDataList()
     })
 }
@@ -150,6 +152,7 @@ const delFile = (row) => {
         if (!result){
             return
         }
+        proxy.Message.success("删除成功！")
         await loadDataList()
         emit("reload")
     })
@@ -166,6 +169,7 @@ const delBatch = () => {
         if (!result){
             return
         }
+        proxy.Message.success("删除成功！")
         await loadDataList()
         emit("reload")
     })
