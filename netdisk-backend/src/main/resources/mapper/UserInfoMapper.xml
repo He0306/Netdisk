@@ -24,4 +24,9 @@
     <select id="selectByEmail" resultType="com.hc.entity.UserInfo">
         select * from tb_user_info where email = #{email}
     </select>
+    <select id="selectUserSpace" resultType="java.lang.Long">
+        select user_space
+        from tb_user_info
+        where user_id = #{userId}
+    </select>
 </mapper>

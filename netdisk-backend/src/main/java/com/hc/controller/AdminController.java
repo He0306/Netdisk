@@ -108,9 +108,9 @@ public class AdminController {
      */
     @PostMapping("/updateUserStatus")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
-    public Result updateUserStatus(HttpSession session,@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer status) {
+    public Result updateUserStatus(HttpSession session, @VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer status) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
-        userInfoService.updateUserInfoStatus(sessionWebUserDto.getUserId(),userId, status);
+        userInfoService.updateUserInfoStatus(sessionWebUserDto.getUserId(), userId, status);
         return Result.success();
     }
 
@@ -170,7 +170,7 @@ public class AdminController {
      * @param fileId
      */
     @RequestMapping("/getFile/{userId}/{fileId}")
-    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public void getFile(HttpServletResponse response,
                         @PathVariable("userId") String userId,
                         @PathVariable("fileId") String fileId) {
@@ -185,7 +185,7 @@ public class AdminController {
      * @param fileId
      */
     @GetMapping("/ts/getVideoInfo/{userId}/{fileId}")
-    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public void getVideo(HttpServletResponse response,
                          @PathVariable("userId") String userId,
                          @PathVariable("fileId") String fileId) {
@@ -213,7 +213,7 @@ public class AdminController {
      * @return
      */
     @PostMapping("/createDownLoadUrl/{userId}/{fileId}")
-    @GlobalInterceptor(checkParams = true,checkAdmin = true)
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result createDownLoadUrl(@VerifyParam(required = true) @PathVariable(value = "fileId") String fileId,
                                     @PathVariable("userId") String userId) {
         String code = fileInfoService.createDownLoadUrl(fileId, userId);
@@ -234,13 +234,19 @@ public class AdminController {
         fileInfoService.download(request, response, code);
     }
 
-    @PostMapping("")
-    @GlobalInterceptor(checkParams = true,checkAdmin = true)
-    public Result adminDelete(@VerifyParam(required = true) String fileIdAndUserIds){
+    /**
+     * 彻底删除
+     *
+     * @param fileIdAndUserIds
+     * @return
+     */
+    @PostMapping("/delFile")
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
+    public Result adminDelete(@VerifyParam(required = true) String fileIdAndUserIds) {
         String[] fileIdAndUserIdsArray = fileIdAndUserIds.split(",");
         for (String fileIdAndUserId : fileIdAndUserIdsArray) {
             String[] itemArray = fileIdAndUserId.split("_");
-            fileInfoService.delFileBatch(itemArray[0],itemArray[1]);
+            fileInfoService.delFileBatch(itemArray[0], itemArray[1],true);
         }
         return Result.success();
     }

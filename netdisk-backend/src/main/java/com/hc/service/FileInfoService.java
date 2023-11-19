@@ -130,7 +130,7 @@ public interface FileInfoService extends IService<FileInfo> {
      * @param userId
      * @param fileIds
      */
-    void delFileBatch(String userId, String fileIds);
+    void delFileBatch(String userId, String fileIds,Boolean isAdmin);
 
     /**
      * 管理员查看所以文件

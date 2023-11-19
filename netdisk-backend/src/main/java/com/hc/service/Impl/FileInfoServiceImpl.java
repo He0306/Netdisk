@@ -142,7 +142,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         List<String> delFileSubFolderFileIdList = new ArrayList<>();
         for (FileInfo fileInfo : fileInfoList) {
             if (FileFolderTypeEnum.FOLDER.getType().equals(fileInfo.getFolderType())) {
-                findAllSubFolderFileList(delFileSubFolderFileIdList, userId, fileInfo.getFileId(), FileDelFlagEnum.DEL.getFlag());
+                findAllSubFolderFileList(delFileSubFolderFileIdList, userId, fileInfo.getFileId(), FileDelFlagEnum.RECYCLE.getFlag().toString());
             }
         }
         // 查询所有根目录的文件
@@ -200,7 +200,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
      * @param fileIds
      */
     @Override
-    public void delFileBatch(String userId, String fileIds) {
+    public void delFileBatch(String userId, String fileIds,Boolean isAdmin) {
         String[] fileIdArray = fileIds.split(",");
         LambdaQueryWrapper<Share> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Share::getUserId, userId).in(Share::getFileId, fileIdArray);
@@ -209,31 +209,39 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
             throw new ServiceException(HttpCodeEnum.CODE_431);
         }
         LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(FileInfo::getUserId, userId).in(FileInfo::getFileId, fileIdArray).eq(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag());
+        wrapper.eq(FileInfo::getUserId, userId).in(FileInfo::getFileId, fileIdArray);
+        if (isAdmin){
+            wrapper.in(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag(),FileDelFlagEnum.USING.getFlag());
+        }else {
+            wrapper.eq(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag());
+        }
         List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
 
         List<String> delFileSubFileFolderFileIdList = new ArrayList<>();
         // 找到所选文件子目录文件ID
         for (FileInfo fileInfo : fileInfoList) {
             if (FileFolderTypeEnum.FOLDER.getType().equals(fileInfo.getFolderType())) {
-                findAllSubFolderFileList(delFileSubFileFolderFileIdList, userId, fileInfo.getFileId(), FileDelFlagEnum.RECYCLE.getFlag());
+                findAllSubFolderFileList(delFileSubFileFolderFileIdList, userId, fileInfo.getFileId(), "1,2");
             }
         }
-        // 更新用户使用空间
-        Long useSpace = fileInfoMapper.selectUserSpace(userId);
-        UserInfo userInfo = new UserInfo();
-        userInfo.setUserId(userId);
-        userInfo.setUserSpace(useSpace);
-        userInfoMapper.updateById(userInfo);
         // 删除服务器文件
         for (FileInfo fileInfo : fileInfoList) {
             // 不删除秒传文件
             LambdaQueryWrapper<FileInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
             lambdaQueryWrapper.in(FileInfo::getFileMd5,fileInfo.getFileMd5());
             Long selectCount = fileInfoMapper.selectCount(lambdaQueryWrapper);
-            if (selectCount == 0) {
+            if (selectCount == 1) {
                 new File(projectFolder + Constants.FILE_FOLDER_FILE + fileInfo.getFilePath()).delete();
             }
+            // 设置缓存
+            UserSpaceDto spaceDto = redisComponent.getUserSpaceDto(userId);
+            spaceDto.setUseSpace(spaceDto.getUseSpace() - fileInfo.getFileSize());
+            redisComponent.saveUserSpaceUse(userId, spaceDto);
+            // 更新用户使用空间
+            UserInfo userInfo = userInfoMapper.selectById(userId);
+            userInfo.setUserId(userId);
+            userInfo.setUserSpace(userInfo.getUserSpace() - fileInfo.getFileSize());
+            userInfoMapper.updateById(userInfo);
         }
         // 删除所有选中文件目录下的文件
         if (!delFileSubFileFolderFileIdList.isEmpty()) {
@@ -241,10 +249,6 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         }
         // 删除文件
         fileInfoMapper.delFileBatch(userId, null, Arrays.asList(fileIdArray));
-        // 设置缓存
-        UserSpaceDto spaceDto = redisComponent.getUserSpaceDto(userId);
-        spaceDto.setUseSpace(useSpace);
-        redisComponent.saveUserSpaceUse(userId,spaceDto);
     }
 
     /**
@@ -366,7 +370,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         }
         List<String> delFilePidList = new ArrayList<>();
         for (FileInfo fileInfo : fileInfoList) {
-            findAllSubFolderFileList(delFilePidList, userId, fileInfo.getFileId(), FileDelFlagEnum.USING.getFlag());
+            findAllSubFolderFileList(delFilePidList, userId, fileInfo.getFileId(), FileDelFlagEnum.USING.getFlag().toString());
         }
         // 将目录更新为删除
         if (!delFilePidList.isEmpty()) {
@@ -392,9 +396,10 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
      * @param fileId
      * @param delFlag
      */
-    private void findAllSubFolderFileList(List<String> fileIdList, String userId, String fileId, Integer delFlag) {
+    private void findAllSubFolderFileList(List<String> fileIdList, String userId, String fileId, String delFlag) {
         LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(FileInfo::getUserId, userId).eq(FileInfo::getFileId, fileId).eq(FileInfo::getDelFlag, delFlag).eq(FileInfo::getFolderType, FileFolderTypeEnum.FOLDER.getType());
+        String[] split = delFlag.split(",");
+        wrapper.eq(FileInfo::getUserId, userId).eq(FileInfo::getFileId, fileId).in(FileInfo::getDelFlag, split).eq(FileInfo::getFolderType, FileFolderTypeEnum.FOLDER.getType());
         List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
         for (FileInfo fileInfo : fileInfoList) {
             findAllSubFolderFileList(fileIdList, userId, fileInfo.getFilePid(), delFlag);

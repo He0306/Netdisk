@@ -16,4 +16,6 @@ public interface UserInfoMapper extends BaseMapper<UserInfo> {
     UserInfo selectByEmail(String email);
 
     Integer updateUserSpaceInteger(@Param("userId") String userId,@Param("userSpace")Long userSpace,@Param("totalSpace")Long totalSpace);
+
+    Long selectUserSpace(String userId);
 }

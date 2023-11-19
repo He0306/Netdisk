@@ -295,6 +295,8 @@ public class AccountController {
      */
     @PostMapping("/logout")
     public Result logout(HttpSession session) {
+        SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+        redisComponent.deleteKey(sessionWebUserDto.getUserId());
         session.invalidate();
         return Result.success();
     }

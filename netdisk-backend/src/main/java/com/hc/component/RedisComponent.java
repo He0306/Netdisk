@@ -61,6 +61,15 @@ public class RedisComponent {
     }
 
     /**
+     * 删除redis
+     *
+     * @param userId
+     */
+    public void deleteKey(String userId) {
+        redisUtil.delKey(Constants.REDIS_KEY_USER_SPACE_USE + userId);
+    }
+
+    /**
      * 根据用户ID重置用户已使用的空间
      *
      * @param userId
@@ -87,7 +96,7 @@ public class RedisComponent {
         if (spaceDto == null) {
             spaceDto = new UserSpaceDto();
             //  查询当前用户上传文件大小总和
-            spaceDto.setUseSpace(fileInfoMapper.selectUserSpace(userId));
+            spaceDto.setUseSpace(userInfoMapper.selectUserSpace(userId));
             spaceDto.setTotalSpace(sysSettingsDto().getUserInitUserSpace() * Constants.MB);
             saveUserSpaceUse(userId, spaceDto);
         }

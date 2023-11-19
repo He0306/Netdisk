@@ -49,4 +49,14 @@ public class RedisUtil<V> {
             return false;
         }
     }
+
+    public boolean delKey(String key) {
+        try {
+            redisTemplate.delete(key);
+            return true;
+        } catch (Exception e) {
+            logger.error("删除redisKey:{}失败", key);
+            return false;
+        }
+    }
 }
