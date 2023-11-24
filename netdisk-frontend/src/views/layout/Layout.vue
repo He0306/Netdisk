@@ -256,10 +256,9 @@ const jump = (data) => {
     router.push(data.path)
 }
 const setMenu = (menuCode, path) => {
-    const menu = menus.find((item) => {
+    currentMenu.value = menus.find((item) => {
         return item.menuCode === menuCode
     })
-    currentMenu.value = menu
     currentPath.value = path
 }
 watch(() => route, (newVal, oldVal) => {

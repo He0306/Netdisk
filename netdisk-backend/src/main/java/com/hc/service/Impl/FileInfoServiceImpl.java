@@ -377,7 +377,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         if (!delFilePidList.isEmpty()) {
             FileInfo fileInfo = new FileInfo();
             fileInfo.setUserId(userId);
-            fileInfo.setDelFlag(FileDelFlagEnum.DEL.getFlag());
+            fileInfo.setDelFlag(FileDelFlagEnum.RECYCLE.getFlag());
             fileInfoMapper.updateFileDelFlagBatch(fileInfo, null, delFilePidList);
         }
         // 将选中的文件更新为回收站

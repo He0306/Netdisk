@@ -1,6 +1,5 @@
 package com.hc.common.exception;
 
-import com.hc.common.enums.HttpCodeEnum;
 import com.hc.common.lang.Result;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

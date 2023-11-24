@@ -137,8 +137,7 @@ public class PreviewUtils {
         }
         fileQueryWrapper.in(FileInfo::getFileId, pathArray);
         fileQueryWrapper.select(FileInfo::getFileName, FileInfo::getFileId);
-        List<FileInfo> selectFiles = fileInfoService.list(fileQueryWrapper);
-        return selectFiles;
+        return fileInfoService.list(fileQueryWrapper);
     }
 
     //让response读取对应的文件,这样response就会携带文件
