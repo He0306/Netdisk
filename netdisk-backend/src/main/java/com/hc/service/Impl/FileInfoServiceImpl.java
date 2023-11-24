@@ -137,12 +137,12 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FileInfo::getUserId, userId);
         wrapper.in(FileInfo::getFileId, fileIdArray);
-        wrapper.eq(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag());
+        wrapper.in(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag(),FileDelFlagEnum.DEL.getFlag());
         List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
         List<String> delFileSubFolderFileIdList = new ArrayList<>();
         for (FileInfo fileInfo : fileInfoList) {
             if (FileFolderTypeEnum.FOLDER.getType().equals(fileInfo.getFolderType())) {
-                findAllSubFolderFileList(delFileSubFolderFileIdList, userId, fileInfo.getFileId(), FileDelFlagEnum.RECYCLE.getFlag().toString());
+                findAllSubFolderFileList(delFileSubFolderFileIdList, userId, fileInfo.getFileId(), "0,1");
             }
         }
         // 查询所有根目录的文件
@@ -151,10 +151,12 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         queryWrapper.eq(FileInfo::getDelFlag, FileDelFlagEnum.USING.getFlag());
         queryWrapper.eq(FileInfo::getFilePid, Constants.ZERO_STR);
         List<FileInfo> selectedList = fileInfoMapper.selectList(queryWrapper);
-        Map<String, FileInfo> rootFileMap = selectedList.stream().collect(Collectors.toMap(FileInfo::getFileName, Function.identity(), (data1, data2) -> data2));
+        Map<String, FileInfo> rootFileMap = selectedList.stream()
+                .collect(Collectors.toMap(FileInfo::getFileName, Function.identity(), (data1, data2) -> data2));
         // 查询所选文件 将目录下的所有删除的文件更新位使用中
         if (!delFileSubFolderFileIdList.isEmpty()) {
             FileInfo fileInfo = new FileInfo();
+            fileInfo.setUserId(userId);
             fileInfo.setDelFlag(FileDelFlagEnum.USING.getFlag());
             fileInfoMapper.updateFileDelFlagBatch(fileInfo, null, delFileSubFolderFileIdList);
         }
@@ -373,14 +375,14 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         for (FileInfo fileInfo : fileInfoList) {
             findAllSubFolderFileList(delFilePidList, userId, fileInfo.getFileId(), FileDelFlagEnum.USING.getFlag().toString());
         }
-        // 将目录更新为删除
+        // 将目录下的文件为删除
         if (!delFilePidList.isEmpty()) {
             FileInfo fileInfo = new FileInfo();
             fileInfo.setUserId(userId);
-            fileInfo.setDelFlag(FileDelFlagEnum.RECYCLE.getFlag());
+            fileInfo.setDelFlag(FileDelFlagEnum.DEL.getFlag());
             fileInfoMapper.updateFileDelFlagBatch(fileInfo, null, delFilePidList);
         }
-        // 将选中的文件更新为回收站
+        // 将选中的目录更新为回收站
         List<String> delFileIdList = Arrays.asList(fileIdArray);
         FileInfo fileInfo = new FileInfo();
         fileInfo.setUserId(userId);

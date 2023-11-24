@@ -8,7 +8,7 @@
                             <el-form-item label="用户昵称">
                                 <el-input clearable placeholder="请输入用户昵称"
                                           v-model.trim="formData.nickName"
-                                          @keyup.native="loadDataList"></el-input>
+                                          @keyup.enter="loadDataList"></el-input>
                             </el-form-item>
                         </el-col>
                         <el-col :span="6">

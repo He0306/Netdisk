@@ -67,6 +67,7 @@
                     </div>
                 </template>
                 <template #delFlag="{ index,row }">
+                    <span v-if="row.delFlag === 1" style="color: #ff0f00">已删除</span>
                     <span v-if="row.delFlag === 1" style="color: #f56c62">回收站</span>
                     <span v-if="row.delFlag === 2" style="color: #529b2e">使用中</span>
                 </template>

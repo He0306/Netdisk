@@ -15,6 +15,16 @@ const router = createRouter({
             component: () => import('@/views/qq/QqLoginCallback.vue')
         },
         {
+            path: '/shareCheck/:shareId',
+            name: '分享检验',
+            component: () => import('@/views/webshare/ShareCheck.vue')
+        },
+        {
+            path: '/share/:shareId',
+            name: '分享',
+            component: () => import('@/views/webshare/Share.vue')
+        },
+        {
             path: '/',
             name: 'Layout',
             component: () => import('@/views/layout/Layout.vue'),
