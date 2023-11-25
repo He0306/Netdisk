@@ -49,8 +49,57 @@
                         </el-button>
                     </div>
                 </div>
+                <Navigation
+                        ref="navigationRef"
+                        @navChange="navChange"
+                        :shareId="shareId">
+                </Navigation>
+                <div class="file-list">
+                    <table
+                            ref="dataListRef"
+                            :columns="columns"
+                            :dataSource="tableData"
+                            :fetch="loadDataList"
+                            :initFetch="false"
+                            :options="tableOptions"
+                            @rowSelected="rowSelected">
+                        <template #fileName="{index,row}">
+                            <div class="file-item" @mouseenter="showOp(row)" @mouseleave="cancelShowOp(row)">
+                                <template v-if=" (row.fileType=== 3 || row.fileType=== 1) && row.status=== 2">
+                                    <Icon :cover="row.fileCover" :width="32" @click="preview(row)"></Icon>
+                                </template>
+                                <template v-else>
+                                    <Icon v-if="row.folderType === 0" :fileType="row.fileType"
+                                          @click="preview(row)"></Icon>
+                                    <Icon v-if="row.folderType === 1" :fileType="0" @click="preview(row)"></Icon>
+                                </template>
+                                <span :title="row.fileName" class="file-name">
+                        </span>
+                                <span class="op">
+                          <template v-if="row.showOp && row.fileId && row.status===2">
+                            <span v-if="row.folderType === 0" class="iconfont icon-download"
+                                  @click="download(row)">下载</span>
+                            <span class="iconfont icon-del" @click="save2MyPanSingle(row)"
+                                  v-if="row.showOp && !shareInfo.currentUser">保存到我的网盘</span>
+                          </template>
+                        </span>
+                            </div>
+                        </template>
+                        <template #delFlag="{ index,row }">
+                            <span v-if="row.delFlag === 1" style="color: #ff0f00">已删除</span>
+                            <span v-if="row.delFlag === 1" style="color: #f56c62">回收站</span>
+                            <span v-if="row.delFlag === 2" style="color: #529b2e">使用中</span>
+                        </template>
+                        <template #fileSize="{index,row}">
+                            <span v-if="row.fileSize">{{ proxy.Utils.sizeToStr(row.fileSize) }}</span>
+                        </template>
+                    </table>
+                </div>
             </div>
         </template>
+        <!--    目录选择    -->
+        <FolderSelect ref="folderSelectRef" @folderSelect="save2MyPanDone"></FolderSelect>
+        <Preview ref="previewRef"></Preview>
     </div>
 </template>
 
@@ -58,6 +107,10 @@
 import {getCurrentInstance, ref} from "vue";
 import {useRoute, useRouter} from "vue-router";
 import Avatar from "@/components/Avatar.vue";
+import Navigation from "@/components/Navigation.vue";
+import Icon from "@/components/Icon.vue";
+import FolderSelect from "@/components/FolderSelect.vue";
+import Preview from "@/components/preview/Preview.vue";
 
 const {proxy} = getCurrentInstance()
 const router = useRouter()
@@ -90,6 +143,162 @@ const getShareInfo = async () => {
     }
     shareInfo.value = result.data
 }
+// 取消分享
+const cancelShare = () => {
+    proxy.Confirm(`你确定取消分享吗？`, async () => {
+        let result = await proxy.Request({
+            url: api.cancelShare,
+            params: {
+                shareIds: shareId
+            }
+        })
+        if (!result) {
+            proxy.Message.error(result.message)
+            return
+        }
+        await loadDataList()
+        proxy.Message.success("取消分享成功！")
+        router.push("/")
+    })
+}
+const jump = () => {
+    router.push("/")
+}
+// 下载
+const download = async (row) => {
+    let result = await proxy.Request({
+        url: api.createDownLoadUrl + "/" + shareId + "/" + row.fileId
+    })
+    if (!result) {
+        return;
+    }
+    window.location.href = api.download + "/" + result.data
+}
+getShareInfo()
+// 保存到我的网盘
+const folderSelectRef = ref()
+const save2MyPanFileIdArray = []
+// 单个保存
+const save2MyPanSingle = (row) => {
+    if (!proxy.VueCookies.get("userInfo")) {
+        router.push("/login?redirectUrl=" + route.path)
+        return;
+    }
+    save2MyPanFileIdArray.value = [row.fileId]
+    folderSelectRef.value.showFolderDialog()
+}
+// 批量保存到我的网盘，并打开文件夹目录
+const save2MyPan = () => {
+    if (selectFileIdList.value.length === 0) {
+        return;
+    }
+    if (!proxy.VueCookies.get("userInfo")) {
+        router.push("/login?redirectUrl=" + route.path)
+        return;
+    }
+    save2MyPanFileIdArray.value = selectFileIdList.value
+    folderSelectRef.value.showFolderDialog()
+}
+// 确定
+const save2MyPanDone = async (folderId) => {
+    let result = await proxy.Request({
+        url: api.saveShare,
+        params: {
+            shareId: shareId,
+            shareFileIds: save2MyPanFileIdArray.value.join(","),
+            myFolderId: folderId
+        }
+    })
+    if (!result) {
+        proxy.Message.error(result.message)
+        return;
+    }
+    await loadDataList()
+    proxy.Message.success("保存成功！")
+    folderSelectRef.value.close()
+}
+// 预览查看
+const previewRef = ref()
+const navigationRef = ref()
+const preview = (data) => {
+    if (data.folderType === 1) {
+        navigationRef.value.openFolder(data)
+        return;
+    }
+    data.shareId = shareId
+    previewRef.value.showPreview(data, 2)
+}
+const showLoading = ref(true)
+// 当前目录
+const currentFolder = ref({fileId: 0})
+const navChange = (data) => {
+    const {curFolder} = data
+    currentFolder.value = curFolder
+    showLoading.value = true
+    loadDataList()
+}
+const loadDataList = async () => {
+    let params = {
+        pageNo: tableData.value.pageNo,
+        pageSize: tableData.value.pageSize,
+        shareId: shareId,
+        filePid: currentFolder.value.fileId
+    }
+    let result = await proxy.Request({
+        url: api.loadFileList,
+        showLoading: showLoading.value,
+        params: params
+    })
+    if (!result) {
+        return;
+    }
+    tableData.value = result.data
+};
+// 展示操作按钮
+const showOp = (row) => {
+    tableData.value.list.forEach((element) => {
+        element.showOp = false;
+    })
+    row.showOp = true;
+}
+const cancelShowOp = (row) => {
+    row.showOp = true;
+}
+// 多选
+const selectFileIdList = ref([])
+const rowSelected = (rows) => {
+    selectFileIdList.value = []
+    rows.forEach((item) => {
+        selectFileIdList.value.push(item.fileId)
+    })
+};
+const tableData = ref({
+    pageNo: 1,
+    pageSize: 15
+})
+const tableOptions = ref({
+    extHeight: 50,
+    selectType: "checkbox"
+})
+
+const columns = [
+    {
+        label: "文件名",
+        prop: "fileName",
+        scopedSlots: "fileName"
+    },
+    {
+        label: "修改时间",
+        prop: "lastUpdateTime",
+        width: 200
+    },
+    {
+        label: "大小",
+        prop: "fileSize",
+        scopedSlots: "fileSize",
+        width: 150
+    }
+]
 </script>
 
 <style lang="scss" scoped>

@@ -142,7 +142,10 @@ watch(() => route, (newVal, oldVal) => {
         if (!props.watchPath) {
             return;
         }
-        if (newVal.path.indexOf("/main") === -1 && newVal.path.indexOf("/settings/fileList")===-1) {
+        if (newVal.path.indexOf("/main") === -1 &&
+            newVal.path.indexOf("/settings/fileList")===-1 &&
+            newVal.path.indexOf("/share")===-1
+        ) {
             return;
         }
         const path = newVal.query.path
