@@ -85,6 +85,7 @@ public interface Constants {
     public static final Integer REDIS_KEY_EXPIRES_DAY = REDIS_KEY_EXPIRES_ONE_MIN * 60 * 24;
 
     public static final String SESSION_KEY = "session_key";
+    public static final String SESSION_SHARE_KEY = "session_share_key";
     public static final String TS_NAME = "index.ts";
     public static final String M3U8_NAME = "m3u8";
 
