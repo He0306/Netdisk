@@ -54,8 +54,6 @@
                         </template>
                         <span :title="row.fileName" class="file-name">
                           <span @click="preview(row)">{{ row.fileName }}</span>
-                          <span v-if="row.status === 0" class="transfer-status">转码中</span>
-                          <span v-if="row.status === 1" class="transfer-status transfer-fail">转码失败</span>
                         </span>
                         <span class="op">
                           <template v-if="row.showOp && row.fileId && row.status===2">

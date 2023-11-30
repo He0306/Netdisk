@@ -66,7 +66,9 @@ const shareId = route.params.shareId
 const getShareInfo = async () => {
     let result = await proxy.Request({
         url: api.getShareInfo,
-        params: shareId
+        params: {
+            shareId
+        }
     })
     if (!result) {
         proxy.Message.error(result.error)
@@ -75,7 +77,7 @@ const getShareInfo = async () => {
     shareInfo.value = result.data
 }
 const checkShare = async () => {
-    form.value.validate(async (valid) => {
+    formRef.value.validate(async (valid) => {
         if (!valid) {
             return;
         }

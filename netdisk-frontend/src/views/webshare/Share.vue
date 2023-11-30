@@ -34,7 +34,7 @@
                     <div class="share-op-btn">
                         <el-button
                                 type="primary"
-                                v-if="shareInfo.cureentUser"
+                                v-if="shareInfo.currentUser"
                                 @click="cancelShare">
                             <span class="iconfont icon-cancel"></span>
                             取消分享
@@ -55,13 +55,14 @@
                         :shareId="shareId">
                 </Navigation>
                 <div class="file-list">
-                    <table
-                            ref="dataListRef"
+                    <Table
+                            ref="dataTableRef"
                             :columns="columns"
                             :dataSource="tableData"
                             :fetch="loadDataList"
                             :initFetch="false"
                             :options="tableOptions"
+                            :showPagination="true"
                             @rowSelected="rowSelected">
                         <template #fileName="{index,row}">
                             <div class="file-item" @mouseenter="showOp(row)" @mouseleave="cancelShowOp(row)">
@@ -73,27 +74,19 @@
                                           @click="preview(row)"></Icon>
                                     <Icon v-if="row.folderType === 1" :fileType="0" @click="preview(row)"></Icon>
                                 </template>
-                                <span :title="row.fileName" class="file-name">
-                        </span>
+                                <span :title="row.fileName" class="file-name"></span>
                                 <span class="op">
-                          <template v-if="row.showOp && row.fileId && row.status===2">
-                            <span v-if="row.folderType === 0" class="iconfont icon-download"
-                                  @click="download(row)">下载</span>
-                            <span class="iconfont icon-del" @click="save2MyPanSingle(row)"
-                                  v-if="row.showOp && !shareInfo.currentUser">保存到我的网盘</span>
-                          </template>
-                        </span>
+                                    <span v-if="row.folderType === 0" class="iconfont icon-download"
+                                          @click="download(row)">下载</span>
+                                    <span class="iconfont icon-del" @click="save2MyPanSingle(row)"
+                                          v-if="row.showOp && !shareInfo.currentUser">保存到我的网盘</span>
+                                </span>
                             </div>
-                        </template>
-                        <template #delFlag="{ index,row }">
-                            <span v-if="row.delFlag === 1" style="color: #ff0f00">已删除</span>
-                            <span v-if="row.delFlag === 1" style="color: #f56c62">回收站</span>
-                            <span v-if="row.delFlag === 2" style="color: #529b2e">使用中</span>
                         </template>
                         <template #fileSize="{index,row}">
                             <span v-if="row.fileSize">{{ proxy.Utils.sizeToStr(row.fileSize) }}</span>
                         </template>
-                    </table>
+                    </Table>
                 </div>
             </div>
         </template>
@@ -111,6 +104,7 @@ import Navigation from "@/components/Navigation.vue";
 import Icon from "@/components/Icon.vue";
 import FolderSelect from "@/components/FolderSelect.vue";
 import Preview from "@/components/preview/Preview.vue";
+import Table from "@/components/Table.vue";
 
 const {proxy} = getCurrentInstance()
 const router = useRouter()
@@ -137,12 +131,14 @@ const getShareInfo = async () => {
         proxy.Message.error(result.message)
         return
     }
+    console.log(result)
     if (result.data == null) {
         router.push(`/shareCheck/${shareId}`)
         return
     }
     shareInfo.value = result.data
 }
+getShareInfo()
 // 取消分享
 const cancelShare = () => {
     proxy.Confirm(`你确定取消分享吗？`, async () => {
@@ -174,7 +170,7 @@ const download = async (row) => {
     }
     window.location.href = api.download + "/" + result.data
 }
-getShareInfo()
+
 // 保存到我的网盘
 const folderSelectRef = ref()
 const save2MyPanFileIdArray = []
@@ -269,7 +265,7 @@ const selectFileIdList = ref([])
 const rowSelected = (rows) => {
     selectFileIdList.value = []
     rows.forEach((item) => {
-        selectFileIdList.value.push(item.fileId)
+        selectFileIdList.value.push(item.shareId)
     })
 };
 const tableData = ref({
@@ -305,33 +301,33 @@ const columns = [
 @import "@/assets/file.list.scss";
 
 .header {
-  width: 100%;
-  position: fixed;
-  background: #0c95f7;
-  height: 50px;
+    width: 100%;
+    position: fixed;
+    background: #0c95f7;
+    height: 50px;
 
-  .header-content {
-    width: 70%;
-    margin: 0px auto;
-    color: #ffffff;
-    line-height: 50px;
+    .header-content {
+        width: 70%;
+        margin: 0 auto;
+        color: #ffffff;
+        line-height: 50px;
 
-    .logo {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
+        .logo {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
 
-      .icon-pan {
-        font-size: 40px;
-      }
+            .icon-pan {
+                font-size: 40px;
+            }
 
-      .name {
-        font-weight: bold;
-        margin-left: 5px;
-        font-size: 25px;
-      }
+            .name {
+                font-weight: bold;
+                margin-left: 5px;
+                font-size: 25px;
+            }
+        }
     }
-  }
 }
 
 .share-body {
@@ -346,7 +342,7 @@ const columns = [
 
   .share-panel {
     margin-top: 20px;
-    display: flex;
+    //display: flex;
     justify-content: space-around;
     border-bottom: 1px solid #dddddd;
     padding-bottom: 10px;
@@ -382,6 +378,9 @@ const columns = [
       }
     }
   }
+}
+.share-op-btn {
+    margin-left: 750px;
 }
 
 .file-list {

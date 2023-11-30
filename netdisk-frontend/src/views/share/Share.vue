@@ -124,25 +124,30 @@ const cancelShareBatch = () => {
     cancelShareDone();
 }
 const cancelShareDone = () => {
-  proxy.Confirm(`你确定要取消分享吗？`,async ()=>{
-      let result = await proxy.Request({
-          url: api.cancelShare,
-          params: {
-              shareIds: cancelShareIdList.value.join(",")
-          }
-      })
-      if (!result){
-          return
-      }
-      proxy.Message.success("取消分享成功！")
-      await loadDataList()
-  })
+    proxy.Confirm(`你确定要取消分享吗？`, async () => {
+        let result = await proxy.Request({
+            url: api.cancelShare,
+            params: {
+                shareIds: cancelShareIdList.value.join(",")
+            }
+        })
+        if (!result) {
+            return
+        }
+        proxy.Message.success("取消分享成功！")
+        await loadDataList()
+    })
 }
 const columns = [
     {
         label: "文件名",
         prop: "fileName",
         scopedSlots: "fileName"
+    },
+    {
+        label: "分享码",
+        prop: "code",
+        width: 100
     },
     {
         label: "分享时间",
@@ -154,6 +159,12 @@ const columns = [
         prop: "expireTime",
         scopedSlots: "expireTime",
         width: 200
+    },
+    {
+        label: "是否失效",
+        prop: "isExp",
+        scopedSlots: "isExp",
+        width: 100
     },
     {
         label: "浏览次数",

@@ -348,6 +348,7 @@ const saveNameEdit = async (index) => {
     }
     tableData.value.list[index] = result.data
     proxy.Message.success("操作成功！")
+    proxy.Message.success("操作成功！")
     editing.value = false
 }
 
