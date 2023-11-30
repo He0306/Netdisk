@@ -137,7 +137,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FileInfo::getUserId, userId);
         wrapper.in(FileInfo::getFileId, fileIdArray);
-        wrapper.in(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag(),FileDelFlagEnum.DEL.getFlag());
+        wrapper.in(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag(), FileDelFlagEnum.DEL.getFlag());
         List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
         List<String> delFileSubFolderFileIdList = new ArrayList<>();
         for (FileInfo fileInfo : fileInfoList) {
@@ -184,7 +184,25 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
     }
 
     /**
-     * 管理员查看所以文件
+     * 校验文件夹
+     *
+     * @param rootFilePid
+     * @param userId
+     * @param fileId
+     */
+    @Override
+    public void checkRootFilePid(String rootFilePid, String userId, String fileId) {
+        if (!StringUtils.isEmpty(fileId)) {
+            throw new ServiceException(HttpCodeEnum.CODE_600);
+        }
+        if (rootFilePid.equals(fileId)) {
+            return;
+        }
+        checkFilePid(rootFilePid, userId, fileId);
+    }
+
+    /**
+     * 管理员查看所有文件
      *
      * @param query
      * @return
@@ -203,7 +221,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
      * @param fileIds
      */
     @Override
-    public void delFileBatch(String userId, String fileIds,Boolean isAdmin) {
+    public void delFileBatch(String userId, String fileIds, Boolean isAdmin) {
         String[] fileIdArray = fileIds.split(",");
         LambdaQueryWrapper<Share> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Share::getUserId, userId).in(Share::getFileId, fileIdArray);
@@ -213,9 +231,9 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         }
         LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(FileInfo::getUserId, userId).in(FileInfo::getFileId, fileIdArray);
-        if (isAdmin){
-            wrapper.in(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag(),FileDelFlagEnum.USING.getFlag());
-        }else {
+        if (isAdmin) {
+            wrapper.in(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag(), FileDelFlagEnum.USING.getFlag());
+        } else {
             wrapper.eq(FileInfo::getDelFlag, FileDelFlagEnum.RECYCLE.getFlag());
         }
         List<FileInfo> fileInfoList = fileInfoMapper.selectList(wrapper);
@@ -231,7 +249,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         for (FileInfo fileInfo : fileInfoList) {
             // 不删除秒传文件
             LambdaQueryWrapper<FileInfo> lambdaQueryWrapper = new LambdaQueryWrapper<>();
-            lambdaQueryWrapper.in(FileInfo::getFileMd5,fileInfo.getFileMd5());
+            lambdaQueryWrapper.in(FileInfo::getFileMd5, fileInfo.getFileMd5());
             Long selectCount = fileInfoMapper.selectCount(lambdaQueryWrapper);
             if (selectCount == 1) {
                 new File(projectFolder + Constants.FILE_FOLDER_FILE + fileInfo.getFilePath()).delete();
@@ -272,7 +290,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
             throw new ServiceException(HttpCodeEnum.CODE_421);
         }
         LambdaQueryWrapper<FileInfo> countWrapper = new LambdaQueryWrapper<>();
-        countWrapper.eq(FileInfo::getFileName, fileName).eq(FileInfo::getDelFlag,FileDelFlagEnum.USING.getFlag());
+        countWrapper.eq(FileInfo::getFileName, fileName).eq(FileInfo::getDelFlag, FileDelFlagEnum.USING.getFlag());
         Long count = fileInfoMapper.selectCount(countWrapper);
         if (count > 1) {
             throw new ServiceException(HttpCodeEnum.CODE_422);
@@ -649,7 +667,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         wrapper.eq(FileInfo::getFileName, fileName);
         wrapper.eq(FileInfo::getFilePid, filePid);
         wrapper.eq(FileInfo::getUserId, userId);
-        wrapper.eq(FileInfo::getDelFlag,FileDelFlagEnum.USING.getFlag());
+        wrapper.eq(FileInfo::getDelFlag, FileDelFlagEnum.USING.getFlag());
         Long count = fileInfoMapper.selectCount(wrapper);
         if (count > 0) {
             throw new ServiceException(HttpCodeEnum.CODE_420);
@@ -832,5 +850,21 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         ProcessUtils.executeCommand(cmd, false);
         // 删除index.tx
         new File(tsPath).delete();
+    }
+
+    private void checkFilePid(String rootFilePid, String fileId, String userId) {
+        LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(FileInfo::getFileId, fileId).eq(FileInfo::getUserId, userId);
+        FileInfo fileInfo = fileInfoMapper.selectOne(wrapper);
+        if (null == fileInfo) {
+            throw new ServiceException(HttpCodeEnum.CODE_600);
+        }
+        if (Constants.ZERO.equals(fileInfo.getFilePid())) {
+            throw new ServiceException(HttpCodeEnum.CODE_600);
+        }
+        if (fileInfo.getFilePid().equals(rootFilePid)) {
+            return;
+        }
+        checkFilePid(rootFilePid, fileId, userId);
     }
 }

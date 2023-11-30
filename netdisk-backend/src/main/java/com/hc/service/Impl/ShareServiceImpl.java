@@ -10,6 +10,7 @@ import com.hc.common.exception.ServiceException;
 import com.hc.common.lang.Constants;
 import com.hc.entity.FileInfo;
 import com.hc.entity.Share;
+import com.hc.entity.dto.SessionShareDto;
 import com.hc.mapper.FileInfoMapper;
 import com.hc.mapper.ShareMapper;
 import com.hc.service.ShareService;
@@ -99,5 +100,31 @@ public class ShareServiceImpl extends ServiceImpl<ShareMapper, Share> implements
         if (count != shareIdArray.length){
             throw new ServiceException(HttpCodeEnum.CODE_600);
         }
+    }
+
+    /**
+     * 校验验分享证码
+     *
+     * @param shareId
+     * @param code
+     * @return
+     */
+    @Override
+    public SessionShareDto checkShareCode(String shareId, String code) {
+        Share share = shareMapper.selectById(shareId);
+        if (null == share || (share.getExpireTime() != null && new Date().after(share.getExpireTime()))) {
+            throw new ServiceException(HttpCodeEnum.CODE_432);
+        }
+        if (!share.getCode().equals(code)){
+            throw new ServiceException(HttpCodeEnum.CODE_433);
+        }
+        // 更新浏览次数
+        shareMapper.updateShareShowCount(shareId);
+        SessionShareDto sessionShareDto = new SessionShareDto();
+        sessionShareDto.setShareId(shareId);
+        sessionShareDto.setShareUserId(share.getUserId());
+        sessionShareDto.setFileId(share.getFileId());
+        sessionShareDto.setExpireTime(share.getExpireTime());
+        return sessionShareDto;
     }
 }

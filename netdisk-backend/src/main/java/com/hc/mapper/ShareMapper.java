@@ -29,4 +29,11 @@ public interface ShareMapper extends BaseMapper<Share> {
      * @param userId
      */
     void deleteByUserId(@Param("userId") String userId);
+
+    /**
+     * 更新浏览次数
+     *
+     * @param shareId
+     */
+    void updateShareShowCount(@Param("shareId") String shareId);
 }

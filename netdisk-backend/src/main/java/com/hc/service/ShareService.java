@@ -3,6 +3,7 @@ package com.hc.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hc.entity.Share;
+import com.hc.entity.dto.SessionShareDto;
 
 /**
  * @author: hec
@@ -36,4 +37,13 @@ public interface ShareService extends IService<Share> {
      * @param userId
      */
     void deleteFileShareBatch(String[] shareIdArray, String userId);
+
+    /**
+     * 校验验分享证码
+     *
+     * @param shareId
+     * @param code
+     * @return
+     */
+    SessionShareDto checkShareCode(String shareId, String code);
 }

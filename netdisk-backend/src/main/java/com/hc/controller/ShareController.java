@@ -62,7 +62,10 @@ public class ShareController {
      */
     @PostMapping("/shareFile")
     @GlobalInterceptor(checkParams = true)
-    public Result shareFile(HttpSession session, @VerifyParam(required = true) String fileId, @VerifyParam(required = true) Integer validType, String code) {
+    public Result shareFile(HttpSession session,
+                            @VerifyParam(required = true) String fileId,
+                            @VerifyParam(required = true) Integer validType,
+                            String code) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
         Share share = new Share();
         share.setUserId(sessionWebUserDto.getUserId());
