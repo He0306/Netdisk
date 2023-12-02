@@ -28,6 +28,8 @@ public class FileInfoQuery extends BaseQuery{
 
     private String userId;
 
+    private boolean queryExpire;
+
     private String userIdFuzzy;
 
     private String fileMd5;

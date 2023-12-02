@@ -148,4 +148,15 @@ public interface FileInfoService extends IService<FileInfo> {
      * @param fileId
      */
     void checkRootFilePid(String rootFilePid, String userId, String fileId);
+
+    /**
+     * 保存到我的文件
+     *
+     * @param shareRootFilePid
+     * @param shareFileIds
+     * @param myFolderId
+     * @param shareUserId
+     * @param currentUserId
+     */
+    void saveShare(String shareRootFilePid, String shareFileIds, String myFolderId, String shareUserId, String currentUserId);
 }

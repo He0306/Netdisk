@@ -134,4 +134,11 @@
         </where>
     </select>
 
+    <select id="findListByRecycle" resultType="com.hc.entity.FileInfo">
+        SELECT * FROM tb_file_info
+        WHERE del_flag = 1
+        <![CDATA[AND recovery_time < DATE_SUB(now(),INTERVAL 10 day)]]>
+    </select>
+
+
 </mapper>

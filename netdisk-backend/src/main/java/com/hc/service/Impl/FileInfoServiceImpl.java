@@ -192,7 +192,7 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
      */
     @Override
     public void checkRootFilePid(String rootFilePid, String userId, String fileId) {
-        if (!StringUtils.isEmpty(fileId)) {
+        if (StringUtils.isEmpty(fileId)) {
             throw new ServiceException(HttpCodeEnum.CODE_600);
         }
         if (rootFilePid.equals(fileId)) {
@@ -212,6 +212,69 @@ public class FileInfoServiceImpl extends ServiceImpl<FileInfoMapper, FileInfo> i
         PageHelper.startPage(query.getPageNo().intValue(), query.getPageSize().intValue());
         List<FileInfo> list = fileInfoMapper.queryAdminList(query);
         return new PageInfo<>(list);
+    }
+
+    /**
+     * 保存到我的文件
+     *
+     * @param shareRootFilePid
+     * @param shareFileIds
+     * @param myFolderId
+     * @param shareUserId
+     * @param currentUserId
+     */
+    @Override
+    public void saveShare(String shareRootFilePid, String shareFileIds, String myFolderId, String shareUserId, String currentUserId) {
+        String[] shareFileIdArray = shareFileIds.split(",");
+        // 目标文件列表
+        LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(FileInfo::getUserId, currentUserId).eq(FileInfo::getFilePid, myFolderId);
+        List<FileInfo> currentFileList = fileInfoMapper.selectList(wrapper);
+        Map<String, FileInfo> currentFileMap = currentFileList.stream().collect(Collectors.toMap(FileInfo::getFileName, Function.identity(), (data1, data2) -> data2));
+        // 选择的文件
+        LambdaQueryWrapper<FileInfo> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(FileInfo::getUserId, shareUserId).in(FileInfo::getFileId, shareFileIdArray);
+        List<FileInfo> shareFileList = fileInfoMapper.selectList(queryWrapper);
+        // 重命名选择的文件
+        List<FileInfo> copyFileList = new ArrayList<>();
+        Date curDate = new Date();
+        for (FileInfo item : shareFileList) {
+            FileInfo haveFile = currentFileMap.get(item.getFileName());
+            if (haveFile != null) {
+                item.setFileName(StringTools.rename(item.getFileName()));
+            }
+            findAllSubFile(copyFileList, item, shareUserId, currentUserId, curDate, myFolderId);
+        }
+        this.saveBatch(copyFileList);
+    }
+
+    /**
+     * 查询所有文件
+     *
+     * @param copyFileList
+     * @param fileInfo
+     * @param sourceUserId
+     * @param currentUserId
+     * @param curDate
+     * @param newFilePid
+     */
+    private void findAllSubFile(List<FileInfo> copyFileList, FileInfo fileInfo, String sourceUserId, String currentUserId, Date curDate, String newFilePid) {
+        String sourceFileId = fileInfo.getFileId();
+        fileInfo.setCreateTime(curDate);
+        fileInfo.setLastUpdateTime(curDate);
+        fileInfo.setFilePid(newFilePid);
+        fileInfo.setUserId(currentUserId);
+        String newFileId = RandomNumberUtil.getRandomNumber(Constants.LENGTH_10);
+        fileInfo.setFileId(newFileId);
+        copyFileList.add(fileInfo);
+        if (FileFolderTypeEnum.FOLDER.getType().equals(fileInfo.getFolderType())) {
+            LambdaQueryWrapper<FileInfo> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(FileInfo::getFilePid, sourceFileId).eq(FileInfo::getUserId, sourceUserId);
+            List<FileInfo> sourceFileList = fileInfoMapper.selectList(wrapper);
+            for (FileInfo item : sourceFileList) {
+                findAllSubFile(copyFileList, item, sourceUserId, currentUserId, curDate, newFileId);
+            }
+        }
     }
 
     /**

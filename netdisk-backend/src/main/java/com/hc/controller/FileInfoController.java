@@ -96,7 +96,7 @@ public class FileInfoController {
      * @param imageName
      */
     @GetMapping("/getImage/{imageFolder}/{imageName}")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true,checkLogin = false)
     public void getImage(HttpServletResponse response, @PathVariable("imageFolder") String imageFolder, @PathVariable("imageName") String imageName) {
         previewUtils.getImage(response, imageFolder, imageName);
     }
