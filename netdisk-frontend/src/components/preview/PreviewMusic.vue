@@ -38,7 +38,7 @@ onMounted(() => {
     })
 })
 onUnmounted(() => {
-    player.value.destory()
+    player.value.destroy()
 })
 </script>
 

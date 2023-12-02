@@ -188,7 +188,7 @@ const addFile = async (file, filePid) => {
 }
 
 // 分片大小
-const chunkSize = 1024 * 1024 * 5;
+const chunkSize = 1024 * 1024;
 // 计算md5
 const computeMd5 = (fileItem) => {
     let file = fileItem.file
