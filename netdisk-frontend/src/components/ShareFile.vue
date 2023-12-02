@@ -105,7 +105,7 @@ const submitForm = async () => {
     })
 }
 const copy = async () => {
-    await toClipboard(`链接：${shareUrl.value}${resultInfo.value.shareId} 提取码，${resultInfo.value.code}`)
+    await toClipboard(`${shareUrl.value}${resultInfo.value.shareId}`)
     proxy.Message.success("复制成功")
 }
 // 取消

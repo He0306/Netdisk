@@ -74,7 +74,9 @@
                                           @click="preview(row)"></Icon>
                                     <Icon v-if="row.folderType === 1" :fileType="0" @click="preview(row)"></Icon>
                                 </template>
-                                <span :title="row.fileName" class="file-name"></span>
+                                <span  :title="row.fileName" class="file-name" >
+                                    <span @click="preview(row)">{{ row.fileName }}</span>
+                                </span>
                                 <span class="op">
                                     <span v-if="row.folderType === 0" class="iconfont icon-download"
                                           @click="download(row)">下载</span>

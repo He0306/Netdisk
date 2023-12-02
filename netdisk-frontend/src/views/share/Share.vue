@@ -106,7 +106,7 @@ const cancelShowOp = (row) => {
 // 复制链接
 const shareUrl = ref(document.location.origin + "/share/")
 const copy = async (data) => {
-    await toClipboard(`链接：${shareUrl.value}${data.shareId} 提取码，${data.code}`)
+    await toClipboard(`${shareUrl.value}${data.shareId}`)
     proxy.Message.success("复制成功！")
 }
 // 取消分享
