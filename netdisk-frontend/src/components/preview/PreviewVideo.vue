@@ -5,6 +5,7 @@
 <script setup>
 import {getCurrentInstance, onMounted, ref} from "vue";
 import DPlayer from "dplayer"
+import Hls from "hls.js";
 
 const {proxy} = getCurrentInstance()
 const props = defineProps({
@@ -23,7 +24,7 @@ const initPlayer = () => {
         screenshot: true,
         video: {
             url: `/api/${props.url}`,
-            type: "customHlS",
+            type: "customHls",
             customType: {
                 customHls: function (video, player) {
                     const hls = new Hls()
