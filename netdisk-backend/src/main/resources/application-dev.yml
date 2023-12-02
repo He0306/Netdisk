@@ -67,7 +67,7 @@ mybatis-plus:
   mapper-locations: classpath:/mapper/*.xml
 ## 日志目录
 project:
-  folder: E:/大学自学/程序员老罗/云盘/
+  folder: E:/大学自学/程序员老罗/云盘
 ## 日志级别配置
 #log:
 #  root:
