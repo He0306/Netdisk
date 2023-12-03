@@ -212,7 +212,7 @@ const showPanel = (type) => {
 }
 // 全局请求路径
 const api = {
-  checkCode: "api/checkCode",
+  checkCode: "/api/checkCode",
   sendEmailCode: '/sendEmailCode',
   register: '/register',
   login: '/login',
