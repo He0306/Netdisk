@@ -40,7 +40,7 @@ public @interface Limit {
      *
      * @return
      */
-    TimeUnit timeunit() default TimeUnit.HOURS;
+    TimeUnit timeunit() default TimeUnit.MINUTES;
 
     /**
      * 提示信息
