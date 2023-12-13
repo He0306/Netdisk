@@ -72,7 +72,7 @@ public class WebShareController {
         ShareInfoVo shareInfoVo = getShareInfoCommon(shareId);
         // 判断是否是当前用户分享的文件
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
-        if (sessionShareDto != null && sessionWebUserDto.getUserId().equals(sessionShareDto.getShareUserId())) {
+        if (sessionWebUserDto != null && sessionWebUserDto.getUserId().equals(sessionShareDto.getShareUserId())) {
             shareInfoVo.setCurrentUser(true);
         } else {
             shareInfoVo.setCurrentUser(false);
@@ -159,7 +159,7 @@ public class WebShareController {
      * @return
      */
     @PostMapping("/saveShare")
-    @GlobalInterceptor(checkParams = true, checkLogin = true)
+    @GlobalInterceptor(checkParams = true)
     public Result saveShare(HttpSession session,
                             @VerifyParam(required = true) String shareId,
                             @VerifyParam(required = true) String shareFileIds,
@@ -171,6 +171,22 @@ public class WebShareController {
         }
         fileInfoService.saveShare(sessionShareDto.getFileId(),shareFileIds,myFolderId,sessionShareDto.getShareUserId(),sessionWebUserDto.getUserId());
         return Result.success();
+    }
+
+    /**
+     * 视频预览
+     *
+     * @param response
+     * @param session
+     * @param fileId
+     */
+    @GetMapping("/ts/getVideoInfo/{shareId}/{fileId}")
+    @GlobalInterceptor(checkParams = true,checkLogin = false)
+    public void getVideo(HttpServletResponse response, HttpSession session,
+                         @PathVariable("shareId") String shareId,
+                         @PathVariable("fileId") String fileId) {
+        SessionShareDto sessionShareDto = checkShare(session, shareId);
+        previewUtils.getVideo(response, fileId, sessionShareDto.getShareUserId());
     }
 
 
@@ -228,7 +244,7 @@ public class WebShareController {
      * @return
      */
     @PostMapping("/createDownLoadUrl/{shareId}/{fileId}")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true,checkLogin = false)
     public Result createDownLoadUrl(HttpSession session,
                                     @VerifyParam(required = true) @PathVariable(value = "shareId") String shareId,
                                     @VerifyParam(required = true) @PathVariable(value = "fileId") String fileId) {
@@ -262,7 +278,7 @@ public class WebShareController {
      * @return
      */
     @PostMapping("/getFolderInfo")
-    @GlobalInterceptor(checkParams = true)
+    @GlobalInterceptor(checkParams = true,checkLogin = false)
     public Result newFolder(HttpSession session,
                             @VerifyParam(required = true) String path,
                             @VerifyParam(required = true) String shareId) {
