@@ -49,6 +49,7 @@ public class ShareServiceImpl extends ServiceImpl<ShareMapper, Share> implements
     public IPage<Share> findShareListByPage(String userId, Integer pageNo, Integer pageSize) {
         Page<Share> page = new Page<>(pageNo, pageSize);
         LambdaQueryWrapper<Share> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(Share::getUserId,userId);
         wrapper.orderByDesc(Share::getShareTime);
         Page<Share> sharePage = shareMapper.selectPage(page, wrapper);
         for (Share share : sharePage.getRecords()) {

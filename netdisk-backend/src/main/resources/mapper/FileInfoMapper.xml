@@ -125,6 +125,9 @@
             <if test="query.filePid != null and query.filePid !=''">
                 and a.file_pid = #{query.filePid}
             </if>
+            <if test="query.fileCategory != null and query.fileCategory !=''">
+                and a.file_category like concat ('%',#{query.fileCategory},'%')
+            </if>
             <if test="query.fileName != null and query.fileName !=''">
                 and a.file_name like concat('%',#{query.fileName},'%')
             </if>
