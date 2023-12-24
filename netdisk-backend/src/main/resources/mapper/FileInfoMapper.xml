@@ -143,5 +143,12 @@
         <![CDATA[AND recovery_time < DATE_SUB(now(),INTERVAL 10 day)]]>
     </select>
 
+    <select id="selectByUserIdAndFilePids" resultType="java.lang.Long">
+        SELECT SUM(file_size) as totalSize
+        FROM tb_file_info
+        WHERE user_id = #{userId} and file_pid in (<foreach collection="filePids" separator="," item="item">#{item}</foreach>)
+        GROUP BY user_id,file_pid
+    </select>
+
 
 </mapper>

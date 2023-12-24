@@ -80,11 +80,21 @@ public interface FileInfoMapper extends BaseMapper<FileInfo> {
      * @param filePidList
      * @param fileIdList
      */
-    void delFileBatch(@Param("userId") String userId, @Param("filePidList") List<String> filePidList,@Param("fileIdList") List<String> fileIdList);
+    void delFileBatch(@Param("userId") String userId, @Param("filePidList") List<String> filePidList, @Param("fileIdList") List<String> fileIdList);
 
     /**
      * 查询
+     *
      * @param fileInfoQuery
      */
     List<FileInfo> findListByRecycle(FileInfoQuery fileInfoQuery);
+
+    /**
+     * 根据userId和filePids查询总文件大小
+     *
+     * @param userId
+     * @param delFileSubFileFolderFileIdList
+     * @return
+     */
+    Long selectByUserIdAndFilePids(@Param("userId") String userId, @Param("filePids") List<String> delFileSubFileFolderFileIdList);
 }
