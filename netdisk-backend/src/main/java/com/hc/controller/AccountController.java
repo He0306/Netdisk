@@ -24,12 +24,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.File;
@@ -161,6 +159,7 @@ public class AccountController {
      * 登录
      *
      * @param session
+     * @param request
      * @param email     邮箱
      * @param password  密码
      * @param checkCode 图片验证码
@@ -169,7 +168,7 @@ public class AccountController {
     @Limit(key = "login", permitsPerSecond = 10, timeout = 1)
     @PostMapping("/login")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
-    public Result login(HttpSession session,
+    public Result login(HttpSession session, HttpServletRequest request,
                         @VerifyParam(required = true) String email,
                         @VerifyParam(required = true, min = 8, max = 16, regex = VerifyRegexEnum.PASSWORD) String password,
                         @VerifyParam(required = true) String checkCode) {
@@ -177,7 +176,8 @@ public class AccountController {
             if (!checkCode.equalsIgnoreCase((String) session.getAttribute(Constants.CHECK_CODE_KEY))) {
                 throw new ServiceException(HttpCodeEnum.CODE_405);
             }
-            SessionWebUserDto sessionWebUserDto = userInfoService.login(email, password);
+
+            SessionWebUserDto sessionWebUserDto = userInfoService.login(email, password, request);
             session.setAttribute(Constants.SESSION_KEY, sessionWebUserDto);
             return Result.success(sessionWebUserDto);
         } finally {
@@ -271,6 +271,14 @@ public class AccountController {
     public Result getUserInfo(HttpSession session) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
         return Result.success(sessionWebUserDto);
+    }
+
+    @PostMapping("/getUserChunkSize")
+    @GlobalInterceptor
+    public Result getUserChunkSize(HttpSession session){
+        SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
+        Integer chunkSize = userInfoService.getUserChunkSizeById(sessionWebUserDto.getUserId());
+        return Result.success(chunkSize);
     }
 
     /**

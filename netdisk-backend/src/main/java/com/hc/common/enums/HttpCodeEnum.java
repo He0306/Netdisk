@@ -44,6 +44,7 @@ public enum HttpCodeEnum {
     CODE_500(500, "服务器内部错误，请联系管理员！"),
     CODE_600(600, "请求参数错误！"),
     CODE_901(901, "登录超时，请重新登录！"),
+    CODE_902(902, "上传文件大小超过限制！"),
     CODE_904(904, "网盘空间不足，请重新扩容");
 
     private Integer status;

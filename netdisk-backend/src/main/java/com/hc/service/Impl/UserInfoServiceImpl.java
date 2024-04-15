@@ -20,6 +20,7 @@ import com.hc.mapper.ShareMapper;
 import com.hc.mapper.UserInfoMapper;
 import com.hc.service.EmailCodeService;
 import com.hc.service.UserInfoService;
+import com.hc.utils.IpUtils;
 import com.hc.utils.JsonUtil;
 import com.hc.utils.MD5Util;
 import com.hc.utils.OKHttpUtils;
@@ -31,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -109,6 +111,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         userInfo.setJoinTime(new Date());
         userInfo.setStatus(UserStatusEnum.ENABLE.getStatus());
         userInfo.setUserSpace(0L);
+        userInfo.setChunkSize(5);
         SysSettingsDto sysSettingsDto = redisComponent.sysSettingsDto();
         userInfo.setTotalSpace(sysSettingsDto.getUserInitUserSpace() * Constants.MB);
         userInfoMapper.insert(userInfo);
@@ -122,7 +125,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
      * @return
      */
     @Override
-    public SessionWebUserDto login(String email, String password) {
+    public SessionWebUserDto login(String email, String password, HttpServletRequest request) {
         UserInfo userInfo = userInfoMapper.selectByEmail(email);
         if (null == userInfo || !MD5Util.encodeByMd5(password).equals(userInfo.getPassword())) {
             throw new ServiceException(HttpCodeEnum.CODE_409);
@@ -132,6 +135,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         }
         // 更新最后登录时间
         userInfo.setLastLoginTime(new Date());
+        String ipAddress = IpUtils.getIpAddress(request);
+        userInfo.setIpAddress(ipAddress);
+        userInfo.setIpSource(IpUtils.getIpInfo(ipAddress));
         userInfoMapper.updateById(userInfo);
 
         SessionWebUserDto sessionWebUserDto = new SessionWebUserDto();
@@ -190,8 +196,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
      * @param status
      */
     @Override
-    public void updateUserInfoStatus(String currentUserId,String userId, Integer status) {
-        if (currentUserId.equals(userId)){
+    public void updateUserInfoStatus(String currentUserId, String userId, Integer status) {
+        if (currentUserId.equals(userId)) {
             throw new ServiceException(HttpCodeEnum.CODE_427);
         }
         UserInfo userInfo = new UserInfo();
@@ -221,6 +227,31 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     }
 
     /**
+     * 更新分片大小
+     *
+     * @param userId
+     * @param chunkSize
+     */
+    @Override
+    public void updateChunkSize(String userId, Integer chunkSize) {
+
+    }
+
+    /**
+     * 根据userId查询分片
+     *
+     * @param userId
+     * @return
+     */
+    @Override
+    public Integer getUserChunkSizeById(String userId) {
+        LambdaQueryWrapper<UserInfo> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(UserInfo::getUserId,userId);
+        wrapper.select(UserInfo::getChunkSize);
+        return userInfoMapper.selectOne(wrapper).getChunkSize();
+    }
+
+    /**
      * 分页查询所以用户
      *
      * @param userInfoQuery
@@ -237,6 +268,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             wrapper.eq(UserInfo::getStatus, userInfoQuery.getStatus());
         }
         wrapper.orderByDesc(UserInfo::getJoinTime);
+        wrapper.select(UserInfo::getUserId, UserInfo::getNickName, UserInfo::getQqAvatar, UserInfo::getEmail, UserInfo::getStatus,
+                UserInfo::getUserSpace, UserInfo::getTotalSpace, UserInfo::getJoinTime, UserInfo::getLastLoginTime,
+                UserInfo::getIpAddress, UserInfo::getIpSource, UserInfo::getChunkSize);
         return userInfoMapper.selectPage(page, wrapper);
     }
 

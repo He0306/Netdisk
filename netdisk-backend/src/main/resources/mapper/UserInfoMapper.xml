@@ -9,7 +9,7 @@
                 user_space = user_space + #{userSpace}
             </if>
             <if test="totalSpace !=null">
-                total_space = total_space + #{totalSpace}
+                total_space = #{totalSpace}
             </if>
         </set>
         where user_id = #{userId}

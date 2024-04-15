@@ -6,6 +6,8 @@ import com.hc.entity.UserInfo;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.query.UserInfoQuery;
 
+import javax.servlet.http.HttpServletRequest;
+
 /**
  * @author: 何超
  * @date: 2023-06-07 17:34
@@ -30,7 +32,7 @@ public interface UserInfoService extends IService<UserInfo> {
      * @param password
      * @return
      */
-    SessionWebUserDto login(String email, String password);
+    SessionWebUserDto login(String email, String password, HttpServletRequest request);
 
     /**
      * 重置密码
@@ -80,4 +82,18 @@ public interface UserInfoService extends IService<UserInfo> {
      * @param userId
      */
     void deleteUser(String currentUserId, String userId);
+
+    /**
+     * 根据userId查询分片
+     * @param userId
+     * @return
+     */
+    Integer getUserChunkSizeById(String userId);
+
+    /**
+     * 更新分片大小
+     * @param userId
+     * @param chunkSize
+     */
+    void updateChunkSize(String userId, Integer chunkSize);
 }
