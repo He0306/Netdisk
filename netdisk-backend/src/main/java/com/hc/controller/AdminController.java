@@ -129,6 +129,20 @@ public class AdminController {
     }
 
     /**
+     * 更新分片大小
+     *
+     * @param userId
+     * @param chunkSize
+     * @return
+     */
+    @PostMapping("/updateChunkSize")
+    @GlobalInterceptor(checkParams = true, checkAdmin = true)
+    public Result updateChunkSize(@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer chunkSize) {
+        userInfoService.updateChunkSize(userId, chunkSize);
+        return Result.success();
+    }
+
+    /**
      * 根据用户ID删除
      *
      * @param session
@@ -246,7 +260,7 @@ public class AdminController {
         String[] fileIdAndUserIdsArray = fileIdAndUserIds.split(",");
         for (String fileIdAndUserId : fileIdAndUserIdsArray) {
             String[] itemArray = fileIdAndUserId.split("_");
-            fileInfoService.delFileBatch(itemArray[0], itemArray[1],true);
+            fileInfoService.delFileBatch(itemArray[0], itemArray[1], true);
         }
         return Result.success();
     }
