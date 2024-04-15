@@ -234,7 +234,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
      */
     @Override
     public void updateChunkSize(String userId, Integer chunkSize) {
-
+        userInfoMapper.updateChunkSize(userId,chunkSize);
     }
 
     /**

@@ -18,4 +18,6 @@ public interface UserInfoMapper extends BaseMapper<UserInfo> {
     Integer updateUserSpaceInteger(@Param("userId") String userId,@Param("userSpace")Long userSpace,@Param("totalSpace")Long totalSpace);
 
     Long selectUserSpace(String userId);
+
+    void updateChunkSize(@Param("userId") String userId,@Param("chunkSize") Integer chunkSize);
 }
