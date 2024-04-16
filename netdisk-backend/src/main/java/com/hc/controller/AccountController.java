@@ -18,6 +18,8 @@ import com.hc.utils.CaptchaCodeUtil;
 import com.hc.utils.FileUtil;
 import com.hc.utils.MD5Util;
 import com.hc.utils.RandomNumberUtil;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +45,7 @@ import java.util.Map;
  * @date: 2023-06-07 17:35
  * @description:
  */
+@Api(tags = "用户相关")
 @RestController
 public class AccountController {
 
@@ -79,6 +82,7 @@ public class AccountController {
      * @param type     0:登录注册 1:邮箱验证码发送 默认0
      * @throws IOException
      */
+    @ApiOperation(value = "生成图片验证码")
     @Limit(key = "checkCode",permitsPerSecond = 1,timeout = 1)
     @GetMapping("/checkCode")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
@@ -106,6 +110,7 @@ public class AccountController {
      * @param type      类型 0:注册 1:找回密码
      * @return
      */
+    @ApiOperation(value = "发送邮箱验证码")
     @Limit(key = "sendEmailCode",permitsPerSecond = 10,timeout = 1)
     @PostMapping("/sendEmailCode")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
@@ -135,6 +140,7 @@ public class AccountController {
      * @param emailCode 邮箱验证码
      * @return
      */
+    @ApiOperation(value = "注册")
     @Limit(key = "register",permitsPerSecond = 10,timeout = 1)
     @PostMapping("/register")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
@@ -165,6 +171,7 @@ public class AccountController {
      * @param checkCode 图片验证码
      * @return
      */
+    @ApiOperation("登录")
     @Limit(key = "login", permitsPerSecond = 10, timeout = 1)
     @PostMapping("/login")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
@@ -195,6 +202,7 @@ public class AccountController {
      * @param emailCode 邮箱验证码
      * @return
      */
+    @ApiOperation(value = "重置密码")
     @PostMapping("/restPwd")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result restPwd(HttpSession session,
@@ -219,6 +227,7 @@ public class AccountController {
      * @param response
      * @param userId
      */
+    @ApiOperation(value = "获取用户头像")
     @GetMapping("/getAvatar/{userId}")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void getAvatar(HttpServletResponse response, @VerifyParam(required = true) @PathVariable("userId") String userId) {
@@ -266,6 +275,7 @@ public class AccountController {
      * @param session
      * @return
      */
+    @ApiOperation(value = "获取用户信息")
     @GetMapping("/getUserInfo")
     @GlobalInterceptor
     public Result getUserInfo(HttpSession session) {
@@ -273,6 +283,12 @@ public class AccountController {
         return Result.success(sessionWebUserDto);
     }
 
+    /**
+     * 获取分片大小
+     * @param session
+     * @return
+     */
+    @ApiOperation(value = "获取分片大小")
     @PostMapping("/getUserChunkSize")
     @GlobalInterceptor
     public Result getUserChunkSize(HttpSession session){
@@ -287,6 +303,7 @@ public class AccountController {
      * @param session
      * @return
      */
+    @ApiOperation(value = "获取用户空间")
     @PostMapping("/getUseSpace")
     @GlobalInterceptor
     public Result getUseSpace(HttpSession session) {
@@ -301,6 +318,7 @@ public class AccountController {
      * @param session
      * @return
      */
+    @ApiOperation(value = "退出登录")
     @PostMapping("/logout")
     public Result logout(HttpSession session) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
@@ -316,6 +334,7 @@ public class AccountController {
      * @param avatar
      * @return
      */
+    @ApiOperation(value = "更新用户头像")
     @PostMapping("/updateUserAvatar")
     @GlobalInterceptor
     public Result updateUserAvatar(HttpSession session, MultipartFile avatar) {
@@ -347,6 +366,7 @@ public class AccountController {
      * @param password
      * @return
      */
+    @ApiOperation(value = "修改密码")
     @PostMapping("/updatePassword")
     @GlobalInterceptor(checkParams = true)
     public Result updatePassword(HttpSession session,
@@ -367,6 +387,7 @@ public class AccountController {
      * @return
      * @throws UnsupportedEncodingException
      */
+    @ApiOperation(value = "QQ登录")
     @Limit(key = "qqLogin",permitsPerSecond = 10,timeout = 1)
     @PostMapping("/qqlogin")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
@@ -388,6 +409,7 @@ public class AccountController {
      * @return
      * @throws UnsupportedEncodingException
      */
+    @ApiOperation(value = "QQ登录回调")
     @PostMapping("/qqlogin/callback")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result qqlogin(HttpSession session, @VerifyParam(required = true) String code, @VerifyParam(required = true) String state) throws UnsupportedEncodingException {

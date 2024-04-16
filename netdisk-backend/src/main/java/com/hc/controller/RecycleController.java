@@ -9,6 +9,8 @@ import com.hc.entity.FileInfo;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.vo.FileInfoPageVO;
 import com.hc.service.FileInfoService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpSession;
  */
 @RestController
 @RequestMapping("/recycle")
+@Api(tags = "回收站相关")
 public class RecycleController {
 
     @Autowired
@@ -37,6 +40,7 @@ public class RecycleController {
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "分页查询回收站数据")
     @PostMapping("/loadRecycleList")
     @GlobalInterceptor
     public Result loadRecycle(HttpSession session, Integer pageNo, Integer pageSize) {
@@ -58,6 +62,7 @@ public class RecycleController {
      * @param fileIds
      * @return
      */
+    @ApiOperation(value = "还原")
     @PostMapping("/recoverFile")
     @GlobalInterceptor
     public Result recoverFile(HttpSession session, @VerifyParam(required = true) String fileIds) {
@@ -73,6 +78,7 @@ public class RecycleController {
      * @param fileIds
      * @return
      */
+    @ApiOperation(value = "彻底删除")
     @PostMapping("/delFile")
     @GlobalInterceptor
     public Result delFile(HttpSession session, @VerifyParam(required = true) String fileIds) {

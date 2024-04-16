@@ -9,6 +9,8 @@ import com.hc.entity.Share;
 import com.hc.entity.dto.SessionWebUserDto;
 import com.hc.entity.vo.SharePageVo;
 import com.hc.service.ShareService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,7 @@ import javax.servlet.http.HttpSession;
  */
 @RestController
 @RequestMapping("/share")
+@Api(tags = "分享相关")
 public class ShareController {
 
     @Autowired
@@ -37,6 +40,7 @@ public class ShareController {
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "分页查询分享")
     @PostMapping("/loadShareList")
     @GlobalInterceptor
     public Result loadShareList(HttpSession session, Integer pageNo, Integer pageSize) {
@@ -60,6 +64,7 @@ public class ShareController {
      * @param code
      * @return
      */
+    @ApiOperation(value = "新增分享")
     @PostMapping("/shareFile")
     @GlobalInterceptor(checkParams = true)
     public Result shareFile(HttpSession session,
@@ -76,11 +81,19 @@ public class ShareController {
         return Result.success(share);
     }
 
+    /**
+     * 取消分享
+     *
+     * @param session
+     * @param shareIds
+     * @return
+     */
+    @ApiOperation(value = "取消分享")
     @PostMapping("/cancelShare")
     @GlobalInterceptor(checkParams = true)
     public Result cancelShare(HttpSession session, @VerifyParam(required = true) String shareIds) {
         SessionWebUserDto sessionWebUserDto = (SessionWebUserDto) session.getAttribute(Constants.SESSION_KEY);
-        shareService.deleteFileShareBatch(shareIds.split(","),sessionWebUserDto.getUserId());
+        shareService.deleteFileShareBatch(shareIds.split(","), sessionWebUserDto.getUserId());
         return Result.success();
     }
 }

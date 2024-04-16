@@ -20,6 +20,8 @@ import com.hc.service.FileInfoService;
 import com.hc.service.ShareService;
 import com.hc.service.UserInfoService;
 import com.hc.utils.PreviewUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
@@ -40,6 +42,7 @@ import java.util.List;
  */
 @RequestMapping("/showShare")
 @RestController
+@Api(tags = "外部分享相关")
 public class WebShareController {
 
     @Autowired
@@ -61,6 +64,7 @@ public class WebShareController {
      * @param shareId
      * @return
      */
+    @ApiOperation(value = "获取登录用户信息")
     @PostMapping("/getShareLoginInfo")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result getShareLoginInfo(HttpSession session,
@@ -86,6 +90,7 @@ public class WebShareController {
      * @param shareId
      * @return
      */
+    @ApiOperation(value = "根据分享ID查询分享信息")
     @PostMapping("/getShareInfo")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result getShareInfo(@VerifyParam(required = true) String shareId) {
@@ -100,6 +105,7 @@ public class WebShareController {
      * @param code
      * @return
      */
+    @ApiOperation(value = "校验分享验证码")
     @PostMapping("/checkShareCode")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result checkShareCode(HttpSession session,
@@ -120,6 +126,7 @@ public class WebShareController {
      * @param pageSize
      * @return
      */
+    @ApiOperation(value = "查询分享列表")
     @PostMapping("/loadFileList")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public Result loadFileList(HttpSession session,
@@ -158,6 +165,7 @@ public class WebShareController {
      * @param myFolderId
      * @return
      */
+    @ApiOperation(value = "保存到我的网盘")
     @PostMapping("/saveShare")
     @GlobalInterceptor(checkParams = true)
     public Result saveShare(HttpSession session,
@@ -180,6 +188,7 @@ public class WebShareController {
      * @param session
      * @param fileId
      */
+    @ApiOperation(value = "视频预览")
     @GetMapping("/ts/getVideoInfo/{shareId}/{fileId}")
     @GlobalInterceptor(checkParams = true,checkLogin = false)
     public void getVideo(HttpServletResponse response, HttpSession session,
@@ -225,6 +234,7 @@ public class WebShareController {
      * @param shareId
      * @param fileId
      */
+    @ApiOperation(value = "预览文件")
     @RequestMapping("/getFile/{shareId}/{fileId}")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void getFile(HttpServletResponse response,
@@ -243,6 +253,7 @@ public class WebShareController {
      * @param fileId
      * @return
      */
+    @ApiOperation(value = "创建下载链接")
     @PostMapping("/createDownLoadUrl/{shareId}/{fileId}")
     @GlobalInterceptor(checkParams = true,checkLogin = false)
     public Result createDownLoadUrl(HttpSession session,
@@ -261,6 +272,7 @@ public class WebShareController {
      * @param code
      * @throws UnsupportedEncodingException
      */
+    @ApiOperation(value = "下载文件")
     @GetMapping("/download/{code}")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void download(HttpServletResponse response,
@@ -277,6 +289,7 @@ public class WebShareController {
      * @param shareId
      * @return
      */
+    @ApiOperation(value = "获取对应文件夹的信息")
     @PostMapping("/getFolderInfo")
     @GlobalInterceptor(checkParams = true,checkLogin = false)
     public Result newFolder(HttpSession session,
@@ -294,6 +307,7 @@ public class WebShareController {
      * @param shareId
      * @return
      */
+    @ApiOperation(value = "验证分享码")
     private SessionShareDto checkShare(HttpSession session, String shareId) {
         SessionShareDto shareDto = (SessionShareDto) session.getAttribute(Constants.SESSION_SHARE_KEY + shareId);
         if (null == shareDto) {

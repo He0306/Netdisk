@@ -14,6 +14,8 @@ import com.hc.entity.query.FileInfoQuery;
 import com.hc.entity.vo.FileInfoPageVO;
 import com.hc.service.FileInfoService;
 import com.hc.utils.PreviewUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ import java.util.List;
  * @date: 2023-06-12 22:44
  * @description:
  */
+@Api(tags = "文件相关")
 @RestController
 @RequestMapping("/file")
 public class FileInfoController {
@@ -47,6 +50,7 @@ public class FileInfoController {
      * @param category
      * @return
      */
+    @ApiOperation(value = "分页查询全部文件")
     @PostMapping("/loadDataList")
     @GlobalInterceptor
     public Result loadDataList(HttpSession session, FileInfoQuery query, String category) {
@@ -80,6 +84,7 @@ public class FileInfoController {
      * @param chunks
      * @return
      */
+    @ApiOperation(value = "上传文件")
     @PostMapping("/uploadFile")
     @GlobalInterceptor(checkParams = true)
     public Result uploadFile(HttpSession session, String fileId, MultipartFile file, @VerifyParam(required = true) String fileName, @VerifyParam(required = true) String filePid, @VerifyParam(required = true) String fileMd5, @VerifyParam(required = true) Integer chunkIndex, @VerifyParam(required = true) Integer chunks) {
@@ -95,6 +100,7 @@ public class FileInfoController {
      * @param imageFolder
      * @param imageName
      */
+    @ApiOperation(value = "预览图片")
     @GetMapping("/getImage/{imageFolder}/{imageName}")
     @GlobalInterceptor(checkParams = true,checkLogin = false)
     public void getImage(HttpServletResponse response, @PathVariable("imageFolder") String imageFolder, @PathVariable("imageName") String imageName) {
@@ -108,6 +114,7 @@ public class FileInfoController {
      * @param session
      * @param fileId
      */
+    @ApiOperation(value = "视频预览")
     @GetMapping("/ts/getVideoInfo/{fileId}")
     @GlobalInterceptor(checkParams = true)
     public void getVideo(HttpServletResponse response, HttpSession session, @PathVariable("fileId") String fileId) {
@@ -122,6 +129,7 @@ public class FileInfoController {
      * @param session
      * @param fileId
      */
+    @ApiOperation(value = "预览文件")
     @RequestMapping("/getFile/{fileId}")
     @GlobalInterceptor(checkParams = true)
     public void getFile(HttpServletResponse response, HttpSession session, @PathVariable("fileId") String fileId) {
@@ -137,6 +145,7 @@ public class FileInfoController {
      * @param fileName
      * @return
      */
+    @ApiOperation(value = "新建文件夹")
     @PostMapping("/newFolder")
     @GlobalInterceptor(checkParams = true)
     public Result newFolder(HttpSession session, @VerifyParam(required = true) String filePid, @VerifyParam(required = true) String fileName) {
@@ -153,6 +162,7 @@ public class FileInfoController {
      * @param path
      * @return
      */
+    @ApiOperation(value = "获取对应文件夹的信息")
     @PostMapping("/getFolderInfo")
     @GlobalInterceptor(checkParams = true)
     public Result newFolder(HttpSession session, @VerifyParam(required = true) String path) {
@@ -169,6 +179,7 @@ public class FileInfoController {
      * @param fileName
      * @return
      */
+    @ApiOperation(value = "重命名")
     @PostMapping("/rename")
     @GlobalInterceptor(checkParams = true)
     public Result rename(HttpSession session, @VerifyParam(required = true) String fileId, @VerifyParam(required = true) String fileName) {
@@ -185,6 +196,7 @@ public class FileInfoController {
      * @param currentFileIds
      * @return
      */
+    @ApiOperation(value = "获取所有目录")
     @PostMapping("/loadAllFolder")
     @GlobalInterceptor(checkParams = true)
     public Result loadAllFolder(HttpSession session, @VerifyParam(required = true) String filePid, String currentFileIds) {
@@ -201,6 +213,7 @@ public class FileInfoController {
      * @param filePid
      * @return
      */
+    @ApiOperation(value = "移动目录")
     @PostMapping("/changeFileFolder")
     @GlobalInterceptor(checkParams = true)
     public Result changeFileFolder(HttpSession session, @VerifyParam(required = true) String fileIds, @VerifyParam(required = true) String filePid) {
@@ -216,6 +229,7 @@ public class FileInfoController {
      * @param fileId
      * @return
      */
+    @ApiOperation(value = "创建下载链接")
     @PostMapping("/createDownLoadUrl/{fileId}")
     @GlobalInterceptor(checkParams = true)
     public Result createDownLoadUrl(HttpSession session, @VerifyParam(required = true) @PathVariable(value = "fileId") String fileId) {
@@ -232,6 +246,7 @@ public class FileInfoController {
      * @param code
      * @throws UnsupportedEncodingException
      */
+    @ApiOperation(value = "下载文件")
     @GetMapping("/download/{code}")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void download(HttpServletResponse response, HttpServletRequest request, @VerifyParam(required = true) @PathVariable(value = "code") String code) throws UnsupportedEncodingException {
@@ -245,6 +260,7 @@ public class FileInfoController {
      * @param fileIds
      * @return
      */
+    @ApiOperation(value = "单删或批量删除")
     @PostMapping("/delFile")
     @GlobalInterceptor(checkParams = true)
     public Result delFile(HttpSession session, @VerifyParam(required = true) String fileIds) {

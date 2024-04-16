@@ -18,6 +18,8 @@ import com.hc.entity.vo.UserInfoPageVO;
 import com.hc.service.FileInfoService;
 import com.hc.service.UserInfoService;
 import com.hc.utils.PreviewUtils;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +35,7 @@ import java.util.List;
  * @email: 2740860037@qq.com
  * @description: 管理员控制器
  */
+@Api(tags = "管理员相关")
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
@@ -54,6 +57,7 @@ public class AdminController {
      *
      * @return
      */
+    @ApiOperation(value = "获取系统设置信息")
     @PostMapping("/getSysSettings")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result getSysSettings() {
@@ -68,6 +72,7 @@ public class AdminController {
      * @param userInitUserSpace
      * @return
      */
+    @ApiOperation(value = "保存系统设置信息")
     @PostMapping("/saveSysSettings")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result saveSysSettings(@VerifyParam(required = true) String registerEmailTitle, @VerifyParam(required = true) String registerEmailContent, @VerifyParam(required = true) Integer userInitUserSpace) {
@@ -85,6 +90,7 @@ public class AdminController {
      * @param userInfoQuery
      * @return
      */
+    @ApiOperation(value = "获取用户信息列表")
     @PostMapping("/loadUserList")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result loadUserList(UserInfoQuery userInfoQuery) {
@@ -106,6 +112,7 @@ public class AdminController {
      * @param status
      * @return
      */
+    @ApiOperation(value = "修改用户状态")
     @PostMapping("/updateUserStatus")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result updateUserStatus(HttpSession session, @VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer status) {
@@ -121,6 +128,7 @@ public class AdminController {
      * @param changeSpace
      * @return
      */
+    @ApiOperation(value = "更新用户使用空间")
     @PostMapping("/updateUserSpace")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result updateUserSpace(@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer changeSpace) {
@@ -135,6 +143,7 @@ public class AdminController {
      * @param chunkSize
      * @return
      */
+    @ApiOperation(value = "更新分片大小")
     @PostMapping("/updateChunkSize")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result updateChunkSize(@VerifyParam(required = true) String userId, @VerifyParam(required = true) Integer chunkSize) {
@@ -149,6 +158,7 @@ public class AdminController {
      * @param userId
      * @return
      */
+    @ApiOperation(value = "根据用户ID删除")
     @PostMapping("/deleteUser")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result deleteUser(HttpSession session, @VerifyParam(required = true) String userId) {
@@ -163,6 +173,7 @@ public class AdminController {
      * @param query
      * @return
      */
+    @ApiOperation(value = "查询所有文件")
     @PostMapping("/loadFileList")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result loadFileList(FileInfoQuery query) {
@@ -183,6 +194,7 @@ public class AdminController {
      * @param userId
      * @param fileId
      */
+    @ApiOperation(value = "预览文件")
     @RequestMapping("/getFile/{userId}/{fileId}")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public void getFile(HttpServletResponse response,
@@ -198,6 +210,7 @@ public class AdminController {
      * @param userId
      * @param fileId
      */
+    @ApiOperation(value = "视频预览")
     @GetMapping("/ts/getVideoInfo/{userId}/{fileId}")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public void getVideo(HttpServletResponse response,
@@ -212,6 +225,7 @@ public class AdminController {
      * @param path
      * @return
      */
+    @ApiOperation(value = "获取对应文件夹的信息")
     @PostMapping("/getFolderInfo")
     @GlobalInterceptor(checkParams = true)
     public Result newFolder(@VerifyParam(required = true) String path) {
@@ -226,6 +240,7 @@ public class AdminController {
      * @param fileId
      * @return
      */
+    @ApiOperation(value = "创建下载链接")
     @PostMapping("/createDownLoadUrl/{userId}/{fileId}")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result createDownLoadUrl(@VerifyParam(required = true) @PathVariable(value = "fileId") String fileId,
@@ -242,6 +257,7 @@ public class AdminController {
      * @param code
      * @throws UnsupportedEncodingException
      */
+    @ApiOperation(value = "下载文件")
     @GetMapping("/download/{code}")
     @GlobalInterceptor(checkParams = true, checkLogin = false)
     public void download(HttpServletResponse response, HttpServletRequest request, @VerifyParam(required = true) @PathVariable(value = "code") String code) throws UnsupportedEncodingException {
@@ -254,6 +270,7 @@ public class AdminController {
      * @param fileIdAndUserIds
      * @return
      */
+    @ApiOperation(value = "彻底删除")
     @PostMapping("/delFile")
     @GlobalInterceptor(checkParams = true, checkAdmin = true)
     public Result adminDelete(@VerifyParam(required = true) String fileIdAndUserIds) {
